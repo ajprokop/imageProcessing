@@ -343,7 +343,6 @@
           $("body").css("cursor", "default");
         } else {
           $("body").css("cursor", "default");
-          console.log("Failure " + request.status + " " + request.readyState);
           if (request.status != 200) {
             logtotoast(TOAST_TYPE_DANGER, "Invalid Image");
           }
@@ -511,9 +510,6 @@
           $("body").css("cursor", "default");
           //   alert("Invalid image request");
           logtotoast(TOAST_TYPE_DANGER, JSON.parse(XMLHttpRequest.responseText).error.message);
-          //console.log(XMLHttpRequest.responseText);
-          //console.log(textStatus);
-          //console.log(errorThrown);
           $("#createImage").prop("disabled", false);
           $(document.getElementById("createImage").querySelector('.spinner-border')).addClass("visually-hidden");
         },
@@ -612,19 +608,11 @@
 
     function messageWithLink(msg) {
       var matches = msg.match(/[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);
-
       if (matches) {
         for (var i = 0; i < matches.length; i++) {
           if (matches[i].toLowerCase().indexOf("http") != -1) {
-            // The user or agent put a link into the chat window
-            msg = msg.replace(
-              matches[i],
-              ' <a href = "' +
-              matches[i] +
-              '"target = "_blank" > ' +
-              matches[i] +
-              " </a>"
-            );
+            // handle hyperlinks
+            msg = msg.replace(matches[i],' <a href = "' + matches[i] + '"target = "_blank" > ' + matches[i] + " </a>");
           }
         }
       }

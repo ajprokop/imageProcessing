@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+  <title>Andrew's DALL-E3 Image Processor</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+    integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+  <!-- Bootstrap Font Icon CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+
+  <link rel="stylesheet" type="text/css" href="css/openai.css" />
+  <link rel="stylesheet" type="text/css" href="css/app.css" />
+  <!-- <link href="/css/dashboard.css" rel="stylesheet" /> -->
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <!-- Header Nav Bar-->
+
+  <div class="row">
+    <div class="col-md-12">
+      <nav class="navbar navbar-expand-lg background-1">
+        <div class="container-fluid">
+          <h3>AI Image Processor</h3>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+            aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+            <form class="d-flex" role="search">
+              <button class="btn btn-icon" data-bs-toggle="modal" data-bs-target="#apimodal" type="button">
+                API
+                <span class="bi bi-gear">
+              </button>
+            </form>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Side Nav Bar Starts-->
+  <div class="container-fluid height-100">
+    <div class="row height-100">
+      <nav id="sidebarMenu" class="col-md-1 d-md-block sidebar collapse text-white bg-dark">
+        <div class="position-sticky pt-3">
+          <ul class="nav flex-column">
+            <li class="nav-item">
+              <a class="nav-link" href="#" id="dalle-tab">
+                <span data-feather="file"></span>
+                <i class="bi bi-image"></i> Generation
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#" id="variations-tab">
+                <span data-feather="home"> </span>
+                <i class="bi bi-image"></i> Variations
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#" id="edits-tab">
+                <span data-feather="home"> </span>
+                <i class="bi bi-image"></i> Edits
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <!-- Side Nav Bar Ends-->
+
+      <!-- Main Work Area-->
+      <main class="col-md-11 ms-sm-auto px-md-0">
+        <div class="row height-100">
+          <!-- Main Panel -->
+          <div class="col-3 col-md-3 px-md-0">
+            <div class="card height-100 px-md-1">
+              <div class="card-body" id="dalle-card">
+                <div class="d-flex flex-column mb-3">
+                  <div class="p-2 flex-grow-1">
+                    <div>
+                      <label for="gptdesc" class="form-label">Image Description</label>
+                      <textarea placeholder="What do you want to create" class="form-control" id="imageDescription"
+                        rows="3"></textarea>
+                    </div>
+                    <div style="padding-top: 5px;">
+                      <button id="createImage" class="btn btn-primary" onclick="createImage()">
+                        Generate Image <span class="spinner-border spinner-border-sm visually-hidden"
+                          aria-hidden="true"></span>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="p-2">
+                    <div>
+                      <label for="gptmodel" class="form-label">Model</label>
+                      <select id="gptmodel" class="form-select" aria-label="Default select example" >
+                        <option value="dall-e-3" selected>Dall-E 3</option>
+                        <option value="dall-e-2">Dall-E 2</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label for="gptsize" class="form-label">Size (Width by Height)</label>
+                      <select id="gptsize" class="form-select" aria-label="Default select example">
+                        <option value="1024x1024" selected>1024x1024</option>
+                        <option value="1024x1792">1024x1792</option>
+                        <option value="1792x1024">1792x1024</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label for="gptquality" class="form-label">Quality</label>
+                    <select id="gptquality" class="form-select" aria-label="Default select example">
+                      <option value="Standard" selected>Standard</option>
+                      <option value="HD">HD</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="gptstyle" class="form-label">Style</label>
+                    <select id="gptstyle" class="form-select" aria-label="Default select example">
+                      <option value="vivid" selected>Vivid</option>
+                      <option value="natural">Natural</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="gptnumber" class="form-label">Number (Dall-E 2 Only)</label>
+                    <select id="gptnumber" class="form-select" aria-label="Default select example">
+                      <option value="1" selected>1</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                      <option value="4">4</option>
+                      <option value="5">5</option>
+                      <option value="6">6</option>
+                      <option value="7">7</option>
+                      <option value="8">8</option>
+                      <option value="9">9</option>
+                      <option value="10">10</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body" id="variations-card" disabled>
+                <div>
+                  <label for="variationsnumber" class="form-label">Number of images</label>
+                  <select id="variationsnumber" class="form-select" aria-label="Default select example">
+                    <option value="1" selected>1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                  </select>
+                </div>
+                <br>
+                <div>
+                  <input type="file" id="file-selector">
+                </div>
+              </div>
+              <div class="card-body" id="edits-card" disabled>
+                <div>
+                  <label for="editDescription" class="form-label">Edit  Description</label>
+                  <textarea placeholder="Edit prompt" class="form-control" id="editDescription" rows="3"></textarea>
+                </div>
+                <div>
+                  <label for="editvariationsnumber" class="form-label">Number of images</label>
+                  <select id="editvariationsnumber" class="form-select" aria-label="Default select example">
+                    <option value="1" selected>1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                  </select>
+                </div>
+                <br>
+                <div>
+                  <input type="file" id="edit-file-selector">
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Image View Port-->
+          <div class="col-9 col-md-9">
+            <div class="d-flex flex-column align-content-end flex-wrap height-100">
+              <!-- For Image-->
+              <div class="p-2 card w-100 flex-grow-1">
+                <h5 class="div-underline">Generated Images</h5>
+                <div id="image-list" class="d-flex flex-column-reverse mb-3"></div>
+              </div>
+              <!-- For Console-->
+              <div class="p-2 card flex-shrink-1" style="margin-top: 5px;">
+                <h5 class="div-underline">Console</h5>
+                <br />
+                <div id="console-log" class="d-flex flex-column-reverse mb-3" readonly=""></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </main>
+      <!-- Main Work Area Ends-->
+    </div>
+  </div>
+
+  <!-- For API Settings Modal-->
+  <div>
+    <div ID="apimodal" class="modal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Settings</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <label for="gptdesc" class="form-label">Open API - Secret KEY</label>
+            <input type="text" placeholder="Enter your api key" class="form-control" id="apiKeyInput">
+            </input>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" onclick="saveAPIKey()">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- For API Settings Modal Ends-->
+
+  <!-- Toast -->
+  <!-- Toast Danger-->
+  <div class="toast-container position-fixed top-5 end-0 p-3">
+    <div id="toastdanger" class="toast align-items-center border-0 text-bg-danger" role="alert" aria-live="assertive"
+      aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">
+          Toast danger
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+          aria-label="Close"></button>
+      </div>
+    </div>
+    <!-- Toast Primary-->
+    <div id="toastprimary" class="toast align-items-center border-0 text-bg-primary" role="alert" aria-live="assertive"
+      aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">
+          Toast Primary
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+          aria-label="Close"></button>
+      </div>
+    </div>
+    <!-- Toast Success-->
+    <div id="toastsuccess" class="toast align-items-center border-0 text-bg-success" role="alert" aria-live="assertive"
+      aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">
+          Toast Success
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+          aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Ends-->
+
+  <script type="text/javascript">
+    const IMAGE_URL = "https://api.openai.com/v1/images/generations";
+    const VARIATIONS_URL = "https://api.openai.com/v1/images/variations";
+    const EDITS_URL = "https://api.openai.com/v1/images/edits";
+    const TOAST_TYPE_PRIMARY = 1;
+    const TOAST_TYPE_DANGER = 2;
+    const TOAST_TYPE_Success = 3;
+
+    const DALLE3 = "dall-e-3";
+    const DALLE2 = "dall-e-2";
+
+    $(document).ready(init);
+
+    const uploadFile = file => {
+      console.log("Uploading file to OpenAI...");          
+      const request = new XMLHttpRequest();         
+      request.open("POST", VARIATIONS_URL, true);
+      request.onreadystatechange = () => {
+        if (request.readyState === 4 && request.status === 200) {
+          console.log(request.responseText);
+          jsonResponse = JSON.parse(request.responseText);
+          for (i = 0; i < jsonResponse.data.length; i++) {
+            addImageToConsole(jsonResponse.data[i].url);
+          }
+          document.getElementById('file-selector').value= null;
+          logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
+          $("body").css("cursor", "default");
+        } else {
+          $("body").css("cursor", "default");
+          if (request.status != 200) {
+            logtotoast(TOAST_TYPE_DANGER, "Invalid Image");
+          }
+        }
+      };
+      var formData = new FormData(); 
+      formData.append('image', file);
+      formData.append('model', DALLE2);
+      formData.append('n', parseInt(document.getElementById("variationsnumber").value, 10));
+      request.setRequestHeader('Authorization', `Bearer ${localStorage.getItem("apiKey")}`)
+      request.setRequestHeader("Accept", "application/json");
+      $("body").css("cursor", "progress");
+      logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
+      request.send(formData);
+    };
+
+    const editFile = file => {
+      console.log("Uploading file to OpenAI...");          
+      const request = new XMLHttpRequest();         
+      request.open("POST", EDITS_URL, true);
+      request.onreadystatechange = () => {
+        if (request.readyState === 4 && request.status === 200) {
+          console.log(request.responseText);
+          jsonResponse = JSON.parse(request.responseText);
+          for (i = 0; i < jsonResponse.data.length; i++) {
+            addImageToConsole(jsonResponse.data[i].url);
+          }
+          document.getElementById('edit-file-selector').value= null;
+          console.log("Success");
+          logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
+          $("body").css("cursor", "default");
+        } else {
+          $("body").css("cursor", "default");
+          console.log("Failure " + request.status + " " + request.readyState);
+          if (request.status != 200) {
+            logtotoast(TOAST_TYPE_DANGER, "Invalid Image");
+          }
+        }
+      };
+      var formData = new FormData(); 
+      formData.append('image', file);
+      formData.append('model', DALLE2);
+      formData.append('prompt', document.getElementById("editDescription").value);
+      formData.append('n', parseInt(document.getElementById("editvariationsnumber").value, 10));
+      request.setRequestHeader('Authorization', `Bearer ${localStorage.getItem("apiKey")}`)
+      request.setRequestHeader("Accept", "application/json");
+      $("body").css("cursor", "progress");
+      logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
+      request.send(formData);
+      document.getElementById("editDescription").value = "";
+    };
+         
+    const fileInput = document.querySelector("#file-selector");
+      fileInput.addEventListener("change", event => {
+        var files = event.target.files;
+        uploadFile(files[0]);
+    });
+
+    const fileInputEdit = document.querySelector("#edit-file-selector");
+      fileInputEdit.addEventListener("change", event => {
+        var files = event.target.files;
+        editFile(files[0]);
+    });
+
+    $('#dalle-tab').on('click', function (e) {
+      console.log("Clicked Dalle")
+      e.preventDefault()
+      $(this).tab('show')
+      document.getElementById("variations-card").style.display = "none";
+      document.getElementById("edits-card").style.display = "none";
+      document.getElementById("dalle-card").style.display = "block";
+    })
+
+    $('#variations-tab').on('click', function (e) {
+      console.log("Clicked Variations")
+      e.preventDefault()
+      $(this).tab('show')
+      document.getElementById("dalle-card").style.display = "none";
+      document.getElementById("edits-card").style.display = "none";
+      document.getElementById("variations-card").style.display = "block";
+    })
+
+    $('#edits-tab').on('click', function (e) {
+      console.log("Clicked Edits")
+      e.preventDefault()
+      $(this).tab('show')
+      document.getElementById("dalle-card").style.display = "none";
+      document.getElementById("variations-card").style.display = "none";
+      document.getElementById("edits-card").style.display = "block";
+    })
+
+    // Initialization function
+    function init() {
+      document.getElementById("variations-card").style.display = "none";
+      document.getElementById("edits-card").style.display = "none";
+      var input = document.getElementById("imageDescription");
+      var apiKeyInput = document.getElementById("apiKeyInput");
+
+      apiKeyInput.value = localStorage.getItem("apiKey");
+
+      input.addEventListener("keyup", function (event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          document.getElementById("createImage").click();
+        }
+      });
+    }
+
+    function logtotoast(type, message) {
+      switch (type) {
+        case TOAST_TYPE_PRIMARY:
+          var toastEle = document.getElementById("toastprimary");
+          toastEle.querySelector('.toast-body').innerHTML = message;
+          const toastPri = bootstrap.Toast.getOrCreateInstance(toastEle);
+          toastPri.show();
+          break;
+        case TOAST_TYPE_DANGER:
+          var toastdgEle = document.getElementById("toastdanger");
+          toastdgEle.querySelector('.toast-body').innerHTML = message;
+          //spinner-border spinner-border-sm visually-hidden
+          const toastdg = bootstrap.Toast.getOrCreateInstance(toastdgEle);
+          toastdg.show();
+          break;
+        case TOAST_TYPE_Success:
+          var toastscEle = document.getElementById("toastsuccess");
+          toastscEle.querySelector('.toast-body').innerHTML = message;
+          //spinner-border spinner-border-sm visually-hidden
+          const toastsc = bootstrap.Toast.getOrCreateInstance(toastscEle);
+          toastsc.show();
+          break;
+        default:
+          console.log('');
+      }
+    }
+
+
+    /**
+     *  To Save API. This will be trigerred from the save button in the modal dialog
+     *  Saves the API key in local storage.
+     * 
+     * Note : Saving API key in local storage can be cause security vulnerability. Use alternate approach for production.
+     */
+    function saveAPIKey() {
+      var apiKey = document.getElementById("apiKeyInput");
+      localStorage.setItem("apiKey", apiKey.value);
+      console.log("Api key saved");
+    }
+
+    function clearAllChats() {
+      $("#console-log").val("");
+      $("#image-list span").remove();
+    }
+
+    async function callGPT(description, size, style, model, number) {
+      $("#createImage").prop("disabled", true);
+      $(document.getElementById("createImage").querySelector('.spinner-border')).removeClass("visually-hidden");
+
+      $("body").css("cursor", "progress");
+
+      const openAI = {
+        model: model,
+        prompt: description,
+        n: 1,
+        size: size,
+        style: style, // vivid or natural
+      };
+
+      openAI.n = parseInt(number, 10);
+
+      logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
+
+      // Calling OpenAPI webservice
+      await $.ajax({
+        type: "POST",
+        url: IMAGE_URL,
+        data: JSON.stringify(openAI),
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("apiKey")}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+
+        success: function (msg) {
+          logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
+          if (model == DALLE3) {
+            addToConsole(`DALL-E3 Description: ${msg.data[0].revised_prompt}`,"Agent");
+          }
+          logtotoast(TOAST_TYPE_PRIMARY, "Loading Image...");
+          for (i = 0; i < msg.data.length; i++) {
+            addImageToConsole(`${msg.data[i].url}`);
+          }
+
+          $("body").css("cursor", "default");
+
+          $("#createImage").prop("disabled", false);
+          $(document.getElementById("createImage").querySelector('.spinner-border')).addClass("visually-hidden");
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+          $("body").css("cursor", "default");
+          //   alert("Invalid image request");
+          logtotoast(TOAST_TYPE_DANGER, JSON.parse(XMLHttpRequest.responseText).error.message);
+          //console.log(XMLHttpRequest.responseText);
+          //console.log(textStatus);
+          //console.log(errorThrown);
+          $("#createImage").prop("disabled", false);
+          $(document.getElementById("createImage").querySelector('.spinner-border')).addClass("visually-hidden");
+        },
+      });
+    }
+
+    // Handle CreateImange function. Main function to call
+    async function createImage() {
+      var input = document.getElementById("imageDescription").value;
+
+      if (input.trim() == "") {
+        logtotoast(TOAST_TYPE_DANGER, "Image description required");
+        //alert("Image description required.");
+      } else {
+        response = await callGPT(
+          document.getElementById("imageDescription").value,
+          document.getElementById("gptsize").value,
+          document.getElementById("gptstyle").value,
+          document.getElementById("gptmodel").value,
+          document.getElementById("gptnumber").value
+        );
+        document.getElementById("imageDescription").value = "";
+      }
+    }
+
+    // Add Image HTML elements to console div
+    function addImageToConsole(url) {
+      var span = createImageElement(url);
+      $("#image-list").append(span);
+      document.getElementById("image-list").scrollTop =
+        document.getElementById("image-list").scrollHeight;
+    }
+
+    // Create Image HTML nodes
+    function createImageElement(url) {
+      var span = document.createElement("span");
+      $(span).addClass("log-element-agent");
+      $(span).addClass("p-2");
+      var sendSpan = document.createElement("span");
+      $(sendSpan).addClass("log-element-sender");
+      sendSpan.innerHTML = `<img src="${url}" alt="" width="100%" height="100%">`;
+      var msgSpan = document.createElement("span");
+      $(msgSpan).addClass("log-element-msg");
+      $(span).append(sendSpan);
+      $(span).append(msgSpan);
+      return span;
+    }
+
+
+    function writeToTrace(text, requestor) {
+      text = text.trim();
+      addToConsole(text, requestor);
+    }
+
+
+    function addToConsole(msg, requestor) {
+      var span = createLogElement(msg, requestor);
+      $("#console-log").append(span);
+      document.getElementById("console-log").scrollTop =
+        document.getElementById("console-log").scrollHeight;
+    }
+
+    function createLogElement(msg, type) {
+      var span = document.createElement("span");
+      if (type == "User") {
+        $(span).addClass("log-element");
+      } else {
+        $(span).addClass("log-element-agent");
+      }
+      $(span).addClass("p-2");
+
+      var msgArray = msg.split(":");
+      var sender = msgArray[0];
+      var restMsg = "";
+
+      for (var i = 1; i < msgArray.length; i++) {
+        if (i == 1) {
+          restMsg += " " + msgArray[i];
+        } else {
+          restMsg += ":" + msgArray[i];
+        }
+      }
+
+      var sendSpan = document.createElement("span");
+
+      $(sendSpan).addClass("log-element-sender");
+      sendSpan.innerHTML = sender + ":";
+      var msgSpan = document.createElement("span");
+      $(msgSpan).addClass("log-element-msg");
+      restMsg = restMsg.replaceAll(`\n`, `<BR>`);
+      $(msgSpan).append(messageWithLink(restMsg));
+      $(span).append(sendSpan);
+      $(span).append(msgSpan);
+      return span;
+    }
+
+    function messageWithLink(msg) {
+      var matches = msg.match(/[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);
+
+      if (matches) {
+        for (var i = 0; i < matches.length; i++) {
+          if (matches[i].toLowerCase().indexOf("http") != -1) {
+            // The user or agent put a link into the chat window
+            msg = msg.replace(
+              matches[i],
+              ' <a href = "' +
+              matches[i] +
+              '"target = "_blank" > ' +
+              matches[i] +
+              " </a>"
+            );
+          }
+        }
+      }
+      return msg;
+    }
+  </script>
+</body>
+
+</html>

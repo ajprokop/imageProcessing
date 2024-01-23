@@ -304,7 +304,6 @@
           for (i = 0; i < jsonResponse.data.length; i++) {
             addImageToConsole(jsonResponse.data[i].url);
           }
-          document.getElementById('file-selector').value= null;
           logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
           $("body").css("cursor", "default");
         } else {
@@ -323,6 +322,7 @@
       $("body").css("cursor", "progress");
       logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
       request.send(formData);
+      document.getElementById('file-selector').value = null;
     };
 
     const editFile = file => {
@@ -336,7 +336,6 @@
           for (i = 0; i < jsonResponse.data.length; i++) {
             addImageToConsole(jsonResponse.data[i].url);
           }
-          document.getElementById('edit-file-selector').value= null;
           console.log("Success");
           logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
           $("body").css("cursor", "default");
@@ -357,6 +356,7 @@
       $("body").css("cursor", "progress");
       logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
       request.send(formData);
+      document.getElementById('edit-file-selector').value = null;
       document.getElementById("editDescription").value = "";
     };
          

@@ -2,7 +2,7 @@
 <!--  Developed by Andrew Prokop and Abhishek Jyothishbabu-->
 <html>
 <head>
-  <title>DALL-E3 Image Processor</title>
+  <title>OpenAI Processor</title>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
     integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
@@ -20,6 +20,8 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
     crossorigin="anonymous"></script>
+
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 
 <body>
@@ -29,7 +31,7 @@
     <div class="col-md-12">
       <nav class="navbar navbar-expand-lg background-1">
         <div class="container-fluid">
-          <h3>AI Image Processor</h3>
+          <h3>OpenAI Processor</h3>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
             data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
             aria-label="Toggle navigation">
@@ -70,6 +72,12 @@
               <a class="nav-link active" aria-current="page" href="#" id="edits-tab">
                 <span data-feather="home"> </span>
                 <i class="bi bi-image"></i> Edits
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#" id="tts-tab">
+                <span data-feather="home"> </span>
+                <i class="bi bi-image"></i> TTS
               </a>
             </li>
           </ul>
@@ -193,6 +201,36 @@
                   <input type="file" id="edit-file-selector">
                 </div>
               </div>
+              <div class="card-body" id="tts-card" disabled>
+                <div>
+                  <label for="ttsDescription" class="form-label">TTS Text</label>
+                  <textarea placeholder="tts prompt" class="form-control" id="ttsDescription" rows="5"></textarea>
+                </div>
+                <div>
+                  <label for="ttsModel" class="form-label">Model</label>
+                  <select id="ttsModel" class="form-select" aria-label="Default select example">
+                    <option value="tts-1" selected>tts-1</option>
+                    <option value="tts-1-hd">tts-1-hd</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="ttsVoice" class="form-label">Voice</label>
+                  <select id="ttsVoice" class="form-select" aria-label="Default select example">
+                    <option value="alloy" selected>alloy</option>
+                    <option value="echo">echo</option>
+                    <option value="fable">fable</option>
+                    <option value="onyx">onyx</option>
+                    <option value="nova">nova</option>
+                    <option value="shimmer">shimmer</option>
+                  </select>
+                </div>
+                <div style="padding-top: 5px;">
+                  <button id="createTTS" class="btn btn-primary" onclick="createTTS()">
+                    Generate TTS <span class="spinner-border spinner-border-sm visually-hidden"
+                      aria-hidden="true"></span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
           <!-- Image View Port-->
@@ -200,7 +238,7 @@
             <div class="d-flex flex-column align-content-end flex-wrap height-100">
               <!-- For Image-->
               <div class="p-2 card w-100 flex-grow-1">
-                <h5 class="div-underline">Generated Images</h5>
+                <h5 class="div-underline">OpenAI Results</h5>
                 <div id="image-list" class="d-flex flex-column-reverse mb-3"></div>
               </div>
               <!-- For Console-->
@@ -284,6 +322,7 @@
     const IMAGE_URL = "https://api.openai.com/v1/images/generations";
     const VARIATIONS_URL = "https://api.openai.com/v1/images/variations";
     const EDITS_URL = "https://api.openai.com/v1/images/edits";
+    const TTS_URL = "https://api.openai.com/v1/audio/speech";
     const TOAST_TYPE_PRIMARY = 1;
     const TOAST_TYPE_DANGER = 2;
     const TOAST_TYPE_Success = 3;
@@ -378,7 +417,18 @@
       $(this).tab('show')
       document.getElementById("variations-card").style.display = "none";
       document.getElementById("edits-card").style.display = "none";
+      document.getElementById("tts-card").style.display = "none";
       document.getElementById("dalle-card").style.display = "block";
+    })
+
+    $('#tts-tab').on('click', function (e) {
+      console.log("Clicked TTS")
+      e.preventDefault()
+      $(this).tab('show')
+      document.getElementById("dalle-card").style.display = "none";
+      document.getElementById("variations-card").style.display = "none";
+      document.getElementById("edits-card").style.display = "none";
+      document.getElementById("tts-card").style.display = "block";
     })
 
     $('#variations-tab').on('click', function (e) {
@@ -387,6 +437,7 @@
       $(this).tab('show')
       document.getElementById("dalle-card").style.display = "none";
       document.getElementById("edits-card").style.display = "none";
+      document.getElementById("tts-card").style.display = "none";
       document.getElementById("variations-card").style.display = "block";
     })
 
@@ -396,12 +447,14 @@
       $(this).tab('show')
       document.getElementById("dalle-card").style.display = "none";
       document.getElementById("variations-card").style.display = "none";
+      document.getElementById("tts-card").style.display = "none";
       document.getElementById("edits-card").style.display = "block";
     })
 
     // Initialization function
     function init() {
       document.getElementById("variations-card").style.display = "none";
+      document.getElementById("tts-card").style.display = "none";
       document.getElementById("edits-card").style.display = "none";
       var input = document.getElementById("imageDescription");
       var apiKeyInput = document.getElementById("apiKeyInput");
@@ -443,9 +496,8 @@
       }
     }
 
-
     /**
-     *  To Save API. This will be trigerred from the save button in the modal dialog
+     *  This will be trigerred from the save button in the modal dialog
      *  Saves the API key in local storage.
      * 
      * Note : Saving API key in local storage can be cause security vulnerability. Use alternate approach for production.
@@ -492,8 +544,8 @@
 
         success: function (msg) {
           logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
-          if (model == DALLE3) {
-            addToConsole(`DALL-E3 Description: ${msg.data[0].revised_prompt}`,"Agent");
+          if (model != DALLE2) {
+            addToConsole(`Image Description: ${msg.data[0].revised_prompt}`,"Agent");
           }
           logtotoast(TOAST_TYPE_PRIMARY, "Loading Image...");
           for (i = 0; i < msg.data.length; i++) {
@@ -513,6 +565,65 @@
           $(document.getElementById("createImage").querySelector('.spinner-border')).addClass("visually-hidden");
         },
       });
+    }
+
+    async function createTTS() {
+      var input = document.getElementById("ttsDescription").value;
+      if (input.trim() == "") {
+        logtotoast(TOAST_TYPE_DANGER, "TTS prompt required");
+        return;
+      }
+      $("#createTTS").prop("disabled", true);
+      $(document.getElementById("createTTS").querySelector('.spinner-border')).removeClass("visually-hidden");
+      var data = JSON.stringify({
+        "model": document.getElementById('ttsModel').value,
+        "input": document.getElementById('ttsDescription').value,
+        "voice": document.getElementById("ttsVoice").value
+      });
+
+      var xhr = new XMLHttpRequest();
+      xhr.responseType = "blob";
+
+      xhr.addEventListener("readystatechange", function() {
+        if(this.readyState === 4) {
+          logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
+          addSoundToConsole(window.URL.createObjectURL(this.response));
+          $("#createTTS").prop("disabled", false);
+          $(document.getElementById("createTTS").querySelector('.spinner-border')).addClass("visually-hidden");
+        }
+      });
+
+      xhr.open("POST", TTS_URL);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.setRequestHeader("Authorization", `Bearer ${localStorage.getItem("apiKey")}`);
+      xhr.setRequestHeader("Accept", "*/*");
+      logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
+      xhr.send(data);
+      document.getElementById('ttsDescription').value = "";
+    }
+
+    function addSoundToConsole(url) {
+      var span = createSoundElement(url);
+      $("#image-list").append(span);
+      document.getElementById("image-list").scrollTop =
+        document.getElementById("image-list").scrollHeight;
+    }
+
+    // Create Image HTML nodes
+    function createSoundElement(url) {
+      var span = document.createElement("span");
+      $(span).addClass("log-element-agent");
+      $(span).addClass("p-2");
+      var sendSpan = document.createElement("span");
+      $(sendSpan).addClass("log-element-sender");
+      //sendSpan.innerHTML = `<audio controls src="${url}" type="audio/mpeg"></audio>`;
+      sendSpan.innerHTML = `<audio style="border:10px solid lightsalmon;border-radius: 50px;" controls><source src="${url}" type="audio/mpeg"></audio>`;
+      console.log(sendSpan.innerHTML)
+      var msgSpan = document.createElement("span");
+      $(msgSpan).addClass("log-element-msg");
+      $(span).append(sendSpan);
+      $(span).append(msgSpan);
+      return span;
     }
 
     // Handle CreateImange function. Main function to call

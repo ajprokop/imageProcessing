@@ -244,7 +244,14 @@
                     <option value="whisper-1" selected>whisper-1</option>
                   </select>
                 </div>
-
+                <div>
+                  <label for="transcriptionLanguage" class="form-label">Language</label>
+                  <textarea placeholder="Language (optional)" class="form-control" id="transcriptionLanguage" rows="1"></textarea>
+                </div>
+                <div>
+                  <label for="transcriptionPrompt" class="form-label">Prompt</label>
+                  <textarea placeholder="Transcription Prompt (optional)" class="form-control" id="transcriptionPrompt" rows="3"></textarea>
+                </div>
                 <br>
                 <div>
                   <input type="file" id="transcription-file-selector">
@@ -441,12 +448,20 @@
       var formData = new FormData(); 
       formData.append('file', file);
       formData.append('model', document.getElementById('transcriptionModel').value);
+      if (document.getElementById('transcriptionLanguage').value != "") {
+        formData.append('language', document.getElementById('transcriptionLanguage').value)
+      }
+      if (document.getElementById('transcriptionPrompt').value != "") {
+        formData.append('prompt', document.getElementById('transcriptionPrompt').value)
+      }
       request.setRequestHeader('Authorization', `Bearer ${localStorage.getItem("apiKey")}`)
       request.setRequestHeader("Accept", "application/json");
       $("body").css("cursor", "progress");
       logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
       request.send(formData);
       document.getElementById('transcription-file-selector').value = null;
+      document.getElementById('transcriptionLanguage').value = "";
+      document.getElementById('transcriptionPrompt').value = "";
     };
          
     const fileInput = document.querySelector("#file-selector");

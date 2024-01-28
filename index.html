@@ -402,7 +402,6 @@
           for (i = 0; i < jsonResponse.data.length; i++) {
             addImageToConsole(jsonResponse.data[i].url);
           }
-          console.log("Success");
           logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
           $("body").css("cursor", "default");
         } else {
@@ -433,7 +432,6 @@
       request.onreadystatechange = () => {
         if (request.readyState === 4 && request.status === 200) {
           console.log(request.responseText);
-          console.log("Success");
           let jsonRequest = JSON.parse(request.responseText);
           addTextToConsole(`Transcription: ${jsonRequest.text}`,"Agent");
           logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
@@ -483,7 +481,6 @@
     });
 
     $('#dalle-tab').on('click', function (e) {
-      console.log("Clicked Dalle")
       e.preventDefault()
       $(this).tab('show')
       document.getElementById("variations-card").style.display = "none";
@@ -494,7 +491,6 @@
     })
 
     $('#tts-tab').on('click', function (e) {
-      console.log("Clicked TTS")
       e.preventDefault()
       $(this).tab('show')
       document.getElementById("dalle-card").style.display = "none";
@@ -505,7 +501,6 @@
     })
 
     $('#transcription-tab').on('click', function (e) {
-      console.log("Clicked Transcription")
       e.preventDefault()
       $(this).tab('show')
       document.getElementById("dalle-card").style.display = "none";
@@ -516,7 +511,6 @@
     })
 
     $('#variations-tab').on('click', function (e) {
-      console.log("Clicked Variations")
       e.preventDefault()
       $(this).tab('show')
       document.getElementById("dalle-card").style.display = "none";
@@ -527,7 +521,6 @@
     })
 
     $('#edits-tab').on('click', function (e) {
-      console.log("Clicked Edits")
       e.preventDefault()
       $(this).tab('show')
       document.getElementById("dalle-card").style.display = "none";

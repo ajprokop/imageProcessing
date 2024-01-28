@@ -65,19 +65,25 @@
             <li class="nav-item">
               <a class="nav-link active" aria-current="page" href="#" id="variations-tab">
                 <span data-feather="home"> </span>
-                <i class="bi bi-image"></i> Variations
+                <i class="bi bi-grid"></i> Variations
               </a>
             </li>
             <li class="nav-item">
               <a class="nav-link active" aria-current="page" href="#" id="edits-tab">
                 <span data-feather="home"> </span>
-                <i class="bi bi-image"></i> Edits
+                <i class="bi bi-pencil-square"></i> Edit
               </a>
             </li>
             <li class="nav-item">
               <a class="nav-link active" aria-current="page" href="#" id="tts-tab">
                 <span data-feather="home"> </span>
-                <i class="bi bi-image"></i> TTS
+                <i class="bi bi-soundwave"></i> TTS
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#" id="transcription-tab">
+                <span data-feather="home"> </span>
+                <i class="bi bi-card-text"></i> Transcription
               </a>
             </li>
           </ul>
@@ -231,6 +237,19 @@
                   </button>
                 </div>
               </div>
+              <div class="card-body" id="transcription-card" disabled>
+                <div>
+                  <label for="transcriptionModel" class="form-label">Model</label>
+                  <select id="transcriptionModel" class="form-select" aria-label="Default select example">
+                    <option value="whisper-1" selected>whisper-1</option>
+                  </select>
+                </div>
+
+                <br>
+                <div>
+                  <input type="file" id="transcription-file-selector">
+                </div>
+              </div>
             </div>
           </div>
           <!-- Image View Port-->
@@ -323,6 +342,7 @@
     const VARIATIONS_URL = "https://api.openai.com/v1/images/variations";
     const EDITS_URL = "https://api.openai.com/v1/images/edits";
     const TTS_URL = "https://api.openai.com/v1/audio/speech";
+    const TRANSCRIPTION_URL = "https://api.openai.com/v1/audio/transcriptions";
     const TOAST_TYPE_PRIMARY = 1;
     const TOAST_TYPE_DANGER = 2;
     const TOAST_TYPE_Success = 3;
@@ -398,6 +418,36 @@
       document.getElementById('edit-file-selector').value = null;
       document.getElementById("editDescription").value = "";
     };
+
+    const transcribeFile = file => {
+      console.log("Uploading file to OpenAI...");          
+      const request = new XMLHttpRequest();         
+      request.open("POST", TRANSCRIPTION_URL, true);
+      request.onreadystatechange = () => {
+        if (request.readyState === 4 && request.status === 200) {
+          console.log(request.responseText);
+          console.log("Success");
+          let jsonRequest = JSON.parse(request.responseText);
+          addTextToConsole(`Transcription: ${jsonRequest.text}`,"Agent");
+          logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
+          $("body").css("cursor", "default");
+        } else {
+          $("body").css("cursor", "default");
+          if (request.status != 200) {
+            logtotoast(TOAST_TYPE_DANGER, "Invalid File");
+          }
+        }
+      };
+      var formData = new FormData(); 
+      formData.append('file', file);
+      formData.append('model', document.getElementById('transcriptionModel').value);
+      request.setRequestHeader('Authorization', `Bearer ${localStorage.getItem("apiKey")}`)
+      request.setRequestHeader("Accept", "application/json");
+      $("body").css("cursor", "progress");
+      logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
+      request.send(formData);
+      document.getElementById('transcription-file-selector').value = null;
+    };
          
     const fileInput = document.querySelector("#file-selector");
       fileInput.addEventListener("change", event => {
@@ -411,6 +461,12 @@
         editFile(files[0]);
     });
 
+    const fileInputTranscription = document.querySelector("#transcription-file-selector");
+      fileInputTranscription.addEventListener("change", event => {
+        var files = event.target.files;
+        transcribeFile(files[0]);
+    });
+
     $('#dalle-tab').on('click', function (e) {
       console.log("Clicked Dalle")
       e.preventDefault()
@@ -418,6 +474,7 @@
       document.getElementById("variations-card").style.display = "none";
       document.getElementById("edits-card").style.display = "none";
       document.getElementById("tts-card").style.display = "none";
+      document.getElementById("transcription-card").style.display = "none";
       document.getElementById("dalle-card").style.display = "block";
     })
 
@@ -428,7 +485,19 @@
       document.getElementById("dalle-card").style.display = "none";
       document.getElementById("variations-card").style.display = "none";
       document.getElementById("edits-card").style.display = "none";
+      document.getElementById("transcription-card").style.display = "none";
       document.getElementById("tts-card").style.display = "block";
+    })
+
+    $('#transcription-tab').on('click', function (e) {
+      console.log("Clicked Transcription")
+      e.preventDefault()
+      $(this).tab('show')
+      document.getElementById("dalle-card").style.display = "none";
+      document.getElementById("variations-card").style.display = "none";
+      document.getElementById("edits-card").style.display = "none";
+      document.getElementById("tts-card").style.display = "none";
+      document.getElementById("transcription-card").style.display = "block";
     })
 
     $('#variations-tab').on('click', function (e) {
@@ -438,6 +507,7 @@
       document.getElementById("dalle-card").style.display = "none";
       document.getElementById("edits-card").style.display = "none";
       document.getElementById("tts-card").style.display = "none";
+      document.getElementById("transcription-card").style.display = "none";
       document.getElementById("variations-card").style.display = "block";
     })
 
@@ -448,6 +518,7 @@
       document.getElementById("dalle-card").style.display = "none";
       document.getElementById("variations-card").style.display = "none";
       document.getElementById("tts-card").style.display = "none";
+      document.getElementById("transcription-card").style.display = "none";
       document.getElementById("edits-card").style.display = "block";
     })
 
@@ -456,6 +527,7 @@
       document.getElementById("variations-card").style.display = "none";
       document.getElementById("tts-card").style.display = "none";
       document.getElementById("edits-card").style.display = "none";
+      document.getElementById("transcription-card").style.display = "none";
       var input = document.getElementById("imageDescription");
       var apiKeyInput = document.getElementById("apiKeyInput");
 
@@ -674,6 +746,46 @@
       addToConsole(text, requestor);
     }
 
+    function addTextToConsole(msg, requestor) {
+      var span = createTextElement(msg, requestor);
+      $("#image-list").append(span);
+      document.getElementById("image-list").scrollTop =
+        document.getElementById("image-list").scrollHeight;
+    }
+
+    function createTextElement(msg, type) {
+      var span = document.createElement("span");
+      if (type == "User") {
+        $(span).addClass("log-element");
+      } else {
+        $(span).addClass("log-element-agent");
+      }
+      $(span).addClass("p-2");
+
+      var msgArray = msg.split(":");
+      var sender = msgArray[0];
+      var restMsg = "";
+
+      for (var i = 1; i < msgArray.length; i++) {
+        if (i == 1) {
+          restMsg += " " + msgArray[i];
+        } else {
+          restMsg += ":" + msgArray[i];
+        }
+      }
+
+      var sendSpan = document.createElement("span");
+
+      $(sendSpan).addClass("log-element-sender");
+      sendSpan.innerHTML = sender + ":";
+      var msgSpan = document.createElement("span");
+      $(msgSpan).addClass("log-element-msg");
+      restMsg = restMsg.replaceAll(`\n`, `<BR>`);
+      $(msgSpan).append(restMsg);
+      $(span).append(sendSpan);
+      $(span).append(msgSpan);
+      return span;
+    }
 
     function addToConsole(msg, requestor) {
       var span = createLogElement(msg, requestor);

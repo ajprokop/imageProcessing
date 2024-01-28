@@ -86,6 +86,12 @@
                 <i class="bi bi-card-text"></i> Transcription
               </a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#" id="translation-tab">
+                <span data-feather="home"> </span>
+                <i class="bi bi-translate"></i> Translation
+              </a>
+            </li>
           </ul>
         </div>
       </nav>
@@ -257,6 +263,22 @@
                   <input type="file" id="transcription-file-selector">
                 </div>
               </div>
+              <div class="card-body" id="translation-card" disabled>
+                <div>
+                  <label for="translationModel" class="form-label">Model</label>
+                  <select id="translationModel" class="form-select" aria-label="Default select example">
+                    <option value="whisper-1" selected>whisper-1</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="translationPrompt" class="form-label">Prompt</label>
+                  <textarea placeholder="Translation Prompt (optional)" class="form-control" id="translationPrompt" rows="3"></textarea>
+                </div>
+                <br>
+                <div>
+                  <input type="file" id="translation-file-selector">
+                </div>
+              </div>
             </div>
           </div>
           <!-- Image View Port-->
@@ -350,6 +372,7 @@
     const EDITS_URL = "https://api.openai.com/v1/images/edits";
     const TTS_URL = "https://api.openai.com/v1/audio/speech";
     const TRANSCRIPTION_URL = "https://api.openai.com/v1/audio/transcriptions";
+    const TRANSLATION_URL = "https://api.openai.com/v1/audio/translations";
     const TOAST_TYPE_PRIMARY = 1;
     const TOAST_TYPE_DANGER = 2;
     const TOAST_TYPE_Success = 3;
@@ -461,6 +484,39 @@
       document.getElementById('transcriptionLanguage').value = "";
       document.getElementById('transcriptionPrompt').value = "";
     };
+
+    const translateFile = file => {
+      console.log("Uploading file to OpenAI...");          
+      const request = new XMLHttpRequest();         
+      request.open("POST", TRANSLATION_URL, true);
+      request.onreadystatechange = () => {
+        if (request.readyState === 4 && request.status === 200) {
+          console.log(request.responseText);
+          let jsonRequest = JSON.parse(request.responseText);
+          addTextToConsole(`English Translation: ${jsonRequest.text}`,"Agent");
+          logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
+          $("body").css("cursor", "default");
+        } else {
+          $("body").css("cursor", "default");
+          if (request.status != 200) {
+            logtotoast(TOAST_TYPE_DANGER, "Invalid File");
+          }
+        }
+      };
+      var formData = new FormData(); 
+      formData.append('file', file);
+      formData.append('model', document.getElementById('translationModel').value);
+      if (document.getElementById('translationPrompt').value != "") {
+        formData.append('prompt', document.getElementById('translationPrompt').value)
+      }
+      request.setRequestHeader('Authorization', `Bearer ${localStorage.getItem("apiKey")}`)
+      request.setRequestHeader("Accept", "application/json");
+      $("body").css("cursor", "progress");
+      logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
+      request.send(formData);
+      document.getElementById('translation-file-selector').value = null;
+      document.getElementById('translationPrompt').value = "";
+    };
          
     const fileInput = document.querySelector("#file-selector");
       fileInput.addEventListener("change", event => {
@@ -472,6 +528,12 @@
       fileInputEdit.addEventListener("change", event => {
         var files = event.target.files;
         editFile(files[0]);
+    });
+
+    const fileInputTranslation = document.querySelector("#translation-file-selector");
+      fileInputTranslation.addEventListener("change", event => {
+        var files = event.target.files;
+        translateFile(files[0]);
     });
 
     const fileInputTranscription = document.querySelector("#transcription-file-selector");
@@ -487,7 +549,19 @@
       document.getElementById("edits-card").style.display = "none";
       document.getElementById("tts-card").style.display = "none";
       document.getElementById("transcription-card").style.display = "none";
+      document.getElementById("translation-card").style.display = "none";
       document.getElementById("dalle-card").style.display = "block";
+    })
+
+    $('#translation-tab').on('click', function (e) {
+      e.preventDefault()
+      $(this).tab('show')
+      document.getElementById("variations-card").style.display = "none";
+      document.getElementById("edits-card").style.display = "none";
+      document.getElementById("tts-card").style.display = "none";
+      document.getElementById("transcription-card").style.display = "none";
+      document.getElementById("dalle-card").style.display = "none";
+      document.getElementById("translation-card").style.display = "block";
     })
 
     $('#tts-tab').on('click', function (e) {
@@ -497,6 +571,7 @@
       document.getElementById("variations-card").style.display = "none";
       document.getElementById("edits-card").style.display = "none";
       document.getElementById("transcription-card").style.display = "none";
+      document.getElementById("translation-card").style.display = "none";
       document.getElementById("tts-card").style.display = "block";
     })
 
@@ -507,6 +582,7 @@
       document.getElementById("variations-card").style.display = "none";
       document.getElementById("edits-card").style.display = "none";
       document.getElementById("tts-card").style.display = "none";
+      document.getElementById("translation-card").style.display = "none";
       document.getElementById("transcription-card").style.display = "block";
     })
 
@@ -517,6 +593,7 @@
       document.getElementById("edits-card").style.display = "none";
       document.getElementById("tts-card").style.display = "none";
       document.getElementById("transcription-card").style.display = "none";
+      document.getElementById("translation-card").style.display = "none";
       document.getElementById("variations-card").style.display = "block";
     })
 
@@ -527,6 +604,7 @@
       document.getElementById("variations-card").style.display = "none";
       document.getElementById("tts-card").style.display = "none";
       document.getElementById("transcription-card").style.display = "none";
+      document.getElementById("translation-card").style.display = "none";
       document.getElementById("edits-card").style.display = "block";
     })
 
@@ -536,6 +614,7 @@
       document.getElementById("tts-card").style.display = "none";
       document.getElementById("edits-card").style.display = "none";
       document.getElementById("transcription-card").style.display = "none";
+      document.getElementById("translation-card").style.display = "none";
       var input = document.getElementById("imageDescription");
       var apiKeyInput = document.getElementById("apiKeyInput");
 

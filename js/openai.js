@@ -4,6 +4,7 @@ const EDITS_URL = "https://api.openai.com/v1/images/edits";
 const TTS_URL = "https://api.openai.com/v1/audio/speech";
 const TRANSCRIPTION_URL = "https://api.openai.com/v1/audio/transcriptions";
 const TRANSLATION_URL = "https://api.openai.com/v1/audio/translations";
+const MODERATION_URL = "https://api.openai.com/v1/moderations";
 const TOAST_TYPE_PRIMARY = 1;
 const TOAST_TYPE_DANGER = 2;
 const TOAST_TYPE_Success = 3;
@@ -181,7 +182,20 @@ $('#dalle-tab').on('click', function (e) {
   document.getElementById("tts-card").style.display = "none";
   document.getElementById("transcription-card").style.display = "none";
   document.getElementById("translation-card").style.display = "none";
+  document.getElementById("moderation-card").style.display = "none";
   document.getElementById("dalle-card").style.display = "block";
+})
+
+$('#moderation-tab').on('click', function (e) {
+  e.preventDefault()
+  $(this).tab('show')
+  document.getElementById("variations-card").style.display = "none";
+  document.getElementById("edits-card").style.display = "none";
+  document.getElementById("tts-card").style.display = "none";
+  document.getElementById("transcription-card").style.display = "none";
+  document.getElementById("translation-card").style.display = "none";
+  document.getElementById("dalle-card").style.display = "none";
+  document.getElementById("moderation-card").style.display = "block";
 })
 
 $('#translation-tab').on('click', function (e) {
@@ -192,6 +206,7 @@ $('#translation-tab').on('click', function (e) {
   document.getElementById("tts-card").style.display = "none";
   document.getElementById("transcription-card").style.display = "none";
   document.getElementById("dalle-card").style.display = "none";
+  document.getElementById("moderation-card").style.display = "none";
   document.getElementById("translation-card").style.display = "block";
 })
 
@@ -203,6 +218,7 @@ $('#tts-tab').on('click', function (e) {
   document.getElementById("edits-card").style.display = "none";
   document.getElementById("transcription-card").style.display = "none";
   document.getElementById("translation-card").style.display = "none";
+  document.getElementById("moderation-card").style.display = "none";
   document.getElementById("tts-card").style.display = "block";
 })
 
@@ -214,6 +230,7 @@ $('#transcription-tab').on('click', function (e) {
   document.getElementById("edits-card").style.display = "none";
   document.getElementById("tts-card").style.display = "none";
   document.getElementById("translation-card").style.display = "none";
+  document.getElementById("moderation-card").style.display = "none";
   document.getElementById("transcription-card").style.display = "block";
 })
 
@@ -225,6 +242,7 @@ $('#variations-tab').on('click', function (e) {
   document.getElementById("tts-card").style.display = "none";
   document.getElementById("transcription-card").style.display = "none";
   document.getElementById("translation-card").style.display = "none";
+  document.getElementById("moderation-card").style.display = "none";
   document.getElementById("variations-card").style.display = "block";
 })
 
@@ -236,12 +254,14 @@ $('#edits-tab').on('click', function (e) {
   document.getElementById("tts-card").style.display = "none";
   document.getElementById("transcription-card").style.display = "none";
   document.getElementById("translation-card").style.display = "none";
+  document.getElementById("moderation-card").style.display = "none";
   document.getElementById("edits-card").style.display = "block";
 })
 
 // Initialization function
 function init() {
   document.getElementById("variations-card").style.display = "none";
+  document.getElementById("moderation-card").style.display = "none";
   document.getElementById("tts-card").style.display = "none";
   document.getElementById("edits-card").style.display = "none";
   document.getElementById("transcription-card").style.display = "none";
@@ -303,6 +323,48 @@ function clearAllChats() {
   $("#image-list span").remove();
 }
 
+async function callModeration(prompt, model) {
+  $("#createModeration").prop("disabled", true);
+  $(document.getElementById("createModeration").querySelector('.spinner-border')).removeClass("visually-hidden");
+
+  $("body").css("cursor", "progress");
+
+  const openAI = {
+    model: model,
+    input: prompt
+  };
+
+  logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
+
+  // Calling OpenAPI webservice
+  await $.ajax({
+    type: "POST",
+    url: MODERATION_URL,
+    data: JSON.stringify(openAI),
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("apiKey")}`,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+
+    success: function (msg) {
+      logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
+
+      $("body").css("cursor", "default");
+      addJsonToConsole(msg.results)
+
+      $("#createModeration").prop("disabled", false);
+      $(document.getElementById("createModeration").querySelector('.spinner-border')).addClass("visually-hidden");
+    },
+    error: function (XMLHttpRequest, textStatus, errorThrown) {
+      $("body").css("cursor", "default");
+      logtotoast(TOAST_TYPE_DANGER, "Invalid Moderation Promppt");
+      $("#createModeration").prop("disabled", false);
+      $(document.getElementById("createModeration").querySelector('.spinner-border')).addClass("visually-hidden");
+    },
+  });
+}
+
 async function callGPT(description, size, style, model, number) {
   $("#createImage").prop("disabled", true);
   $(document.getElementById("createImage").querySelector('.spinner-border')).removeClass("visually-hidden");
@@ -355,6 +417,20 @@ async function callGPT(description, size, style, model, number) {
       $(document.getElementById("createImage").querySelector('.spinner-border')).addClass("visually-hidden");
     },
   });
+}
+
+async function createModeration() {
+  var input = document.getElementById("moderationPrompt").value;
+
+  if (input.trim() == "") {
+    logtotoast(TOAST_TYPE_DANGER, "Moderation prompt required");
+  } else {
+    response = await callModeration(
+      document.getElementById("moderationPrompt").value,
+      document.getElementById("moderationModel").value
+    );
+    document.getElementById("moderationPrompt").value = "";
+  } 
 }
 
 async function createTTS() {
@@ -462,6 +538,27 @@ function createImageElement(url) {
 function writeToTrace(text, requestor) {
   text = text.trim();
   addToConsole(text, requestor);
+}
+
+function addJsonToConsole(msg) {
+  var span = createJsonElement(msg);
+  $("#image-list").append(span);
+  document.getElementById("image-list").scrollTop =
+    document.getElementById("image-list").scrollHeight;
+}
+
+function createJsonElement(msg) {
+  var span = document.createElement("span");
+  $(span).addClass("log-element-agent");
+  $(span).addClass("p-2");
+  var sendSpan = document.createElement("span");
+  $(sendSpan).addClass("log-element-sender");
+  sendSpan.innerHTML = `<pre id="json-data">${JSON.stringify(msg, null, 2)}</pre>`;
+  var msgSpan = document.createElement("span");
+  $(msgSpan).addClass("log-element-msg");
+  $(span).append(sendSpan);
+  $(span).append(msgSpan);
+  return span;
 }
 
 function addTextToConsole(msg, requestor) {

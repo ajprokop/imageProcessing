@@ -75,6 +75,12 @@
               </a>
             </li>
             <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#" id="moderation-tab">
+                <span data-feather="home"> </span>
+                <i class="bi bi-stoplights"></i> Moderation
+              </a>
+            </li>
+            <li class="nav-item">
               <a class="nav-link active" aria-current="page" href="#" id="tts-tab">
                 <span data-feather="home"> </span>
                 <i class="bi bi-soundwave"></i> TTS
@@ -277,6 +283,25 @@
                 <br>
                 <div>
                   <input type="file" id="translation-file-selector">
+                </div>
+              </div>
+              <div class="card-body" id="moderation-card" disabled>
+                <div>
+                  <label for="moderationModel" class="form-label">Model</label>
+                  <select id="moderationModel" class="form-select" aria-label="Default select example">
+                    <option value="text-moderation-latest" selected>text-moderation-latest</option>
+                    <option value="text-moderation-stable" selected>text-moderation-stable</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="moderationPrompt" class="form-label">Prompt</label>
+                  <textarea placeholder="Moderation Prompt" class="form-control" id="moderationPrompt" rows="3"></textarea>
+                </div>
+                <div style="padding-top: 5px;">
+                  <button id="createModeration" class="btn btn-primary" onclick="createModeration()">
+                    Create Moderation <span class="spinner-border spinner-border-sm visually-hidden"
+                      aria-hidden="true"></span>
+                  </button>
                 </div>
               </div>
             </div>

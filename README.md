@@ -5,3 +5,7 @@ Images can be created with either the Dall-e-2 and Dall-e-3 models.  Dall-e-3 im
 A mask file is required for image editing.  Mask files of existing images (sqaure, PNG, less than 4MB) can be created using this tool:  https://ai-image-editor.netlify.app/
 
 To learn more about the mask tool:  https://medium.com/@david.richards.tech/how-to-create-openai-dall-e-mask-images-ed8feb562eba
+
+Although the application began to showcase OpenAI image processing, it has been subsequently modified to support audio functionality -- TTS, transcription, and translation.  
+
+Note:  At this point translation is not working.  It acts like transcription and not translation to English.  I believe this is a problem with the OpenAI API and not this code.

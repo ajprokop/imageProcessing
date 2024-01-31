@@ -184,8 +184,8 @@ function showOrHide(variations, edits, tts, transcription, translation, moderati
   document.getElementById("edits-card").style.display = edits;
   document.getElementById("tts-card").style.display = tts;
   document.getElementById("transcription-card").style.display = transcription;
-  document.getElementById("translation-card").style.display = moderation;
-  document.getElementById("moderation-card").style.display = translation;
+  document.getElementById("moderation-card").style.display = moderation;
+  document.getElementById("translation-card").style.display = translation;
   document.getElementById("dalle-card").style.display = dalle;
 }
 
@@ -462,44 +462,17 @@ function addResponse(type, msg) {
 }
 
 function createElement(type, msg) {
+  var span = document.createElement("span");
+  $(span).addClass("log-element-agent");
+  $(span).addClass("p-2");
+  var sendSpan = document.createElement("span");
+  $(sendSpan).addClass("log-element-sender");
   if (type == AUDIO) {
-    var span = document.createElement("span");
-    $(span).addClass("log-element-agent");
-    $(span).addClass("p-2");
-    var sendSpan = document.createElement("span");
-    $(sendSpan).addClass("log-element-sender");
-    //sendSpan.innerHTML = `<audio controls src="${url}" type="audio/mpeg"></audio>`;
     sendSpan.innerHTML = `<audio style="border:10px solid lightsalmon;border-radius: 50px;" controls><source src="${msg}" type="audio/mpeg"></audio>`;
-    console.log(sendSpan.innerHTML)
-    var msgSpan = document.createElement("span");
-    $(msgSpan).addClass("log-element-msg");
-    $(span).append(sendSpan);
-    $(span).append(msgSpan);
-    return span;
   } else if (type == IMAGE) {
-    var span = document.createElement("span");
-    $(span).addClass("log-element-agent");
-    $(span).addClass("p-2");
-    var sendSpan = document.createElement("span");
-    $(sendSpan).addClass("log-element-sender");
     sendSpan.innerHTML = `<img src="${msg}" alt="" width="100%" height="100%">`;
-    var msgSpan = document.createElement("span");
-    $(msgSpan).addClass("log-element-msg");
-    $(span).append(sendSpan);
-    $(span).append(msgSpan);
-    return span;
   } else if (type == MODERATION) {
-    var span = document.createElement("span");
-    $(span).addClass("log-element-agent");
-    $(span).addClass("p-2");
-    var sendSpan = document.createElement("span");
-    $(sendSpan).addClass("log-element-sender");
     sendSpan.innerHTML = `<pre id="json-data">${JSON.stringify(msg, null, 2)}</pre>`;
-    var msgSpan = document.createElement("span");
-    $(msgSpan).addClass("log-element-msg");
-    $(span).append(sendSpan);
-    $(span).append(msgSpan);
-    return span;
   } else if (type == TEXT) {
     var span = document.createElement("span");
     $(span).addClass("log-element-agent");
@@ -525,6 +498,11 @@ function createElement(type, msg) {
     $(span).append(msgSpan);
     return span;   
   }
+  var msgSpan = document.createElement("span");
+  $(msgSpan).addClass("log-element-msg");
+  $(span).append(sendSpan);
+  $(span).append(msgSpan);
+  return span;
 }
 
 function addToConsole(msg, requestor) {

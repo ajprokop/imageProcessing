@@ -18,142 +18,6 @@ const AUDIO = 3;
 const TEXT = 4;
 
 $(document).ready(init);
-
-const uploadFile = file => {
-  console.log("Uploading file to OpenAI...");          
-  const request = new XMLHttpRequest();         
-  request.open("POST", VARIATIONS_URL, true);
-  request.onreadystatechange = () => {
-    if (request.readyState === 4 && request.status === 200) {
-      console.log(request.responseText);
-      jsonResponse = JSON.parse(request.responseText);
-      for (i = 0; i < jsonResponse.data.length; i++) {
-        addResponse(IMAGE, jsonResponse.data[i].url);
-      }
-      logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
-      $("body").css("cursor", "default");
-    } else {
-      $("body").css("cursor", "default");
-      if (request.status != 200) {
-        logtotoast(TOAST_TYPE_DANGER, "Invalid Image");
-      }
-    }
-  };
-  var formData = new FormData(); 
-  formData.append('image', file);
-  formData.append('model', DALLE2);
-  formData.append('n', parseInt(document.getElementById("variationsnumber").value, 10));
-  request.setRequestHeader('Authorization', `Bearer ${localStorage.getItem("apiKey")}`)
-  request.setRequestHeader("Accept", "application/json");
-  $("body").css("cursor", "progress");
-  logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
-  request.send(formData);
-  document.getElementById('file-selector').value = null;
-};
-
-const editFile = file => {
-  console.log("Uploading file to OpenAI...");          
-  const request = new XMLHttpRequest();         
-  request.open("POST", EDITS_URL, true);
-  request.onreadystatechange = () => {
-    if (request.readyState === 4 && request.status === 200) {
-      console.log(request.responseText);
-      jsonResponse = JSON.parse(request.responseText);
-      for (i = 0; i < jsonResponse.data.length; i++) {
-        addResponse(IMAGE, jsonResponse.data[i].url);
-      }
-      logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
-      $("body").css("cursor", "default");
-    } else {
-      $("body").css("cursor", "default");
-      if (request.status != 200) {
-        logtotoast(TOAST_TYPE_DANGER, "Invalid Image");
-      }
-    }
-  };
-  var formData = new FormData(); 
-  formData.append('image', file);
-  formData.append('model', DALLE2);
-  formData.append('prompt', document.getElementById("editDescription").value);
-  formData.append('n', parseInt(document.getElementById("editvariationsnumber").value, 10));
-  request.setRequestHeader('Authorization', `Bearer ${localStorage.getItem("apiKey")}`)
-  request.setRequestHeader("Accept", "application/json");
-  $("body").css("cursor", "progress");
-  logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
-  request.send(formData);
-  document.getElementById('edit-file-selector').value = null;
-  document.getElementById("editDescription").value = "";
-};
-
-const transcribeFile = file => {
-  console.log("Uploading file to OpenAI...");          
-  const request = new XMLHttpRequest();         
-  request.open("POST", TRANSCRIPTION_URL, true);
-  request.onreadystatechange = () => {
-    if (request.readyState === 4 && request.status === 200) {
-      console.log(request.responseText);
-      let jsonRequest = JSON.parse(request.responseText);
-      addResponse(TEXT, `Transcription: ${jsonRequest.text}`);
-      logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
-      $("body").css("cursor", "default");
-    } else {
-      $("body").css("cursor", "default");
-      if (request.status != 200) {
-        logtotoast(TOAST_TYPE_DANGER, "Invalid File");
-      }
-    }
-  };
-  var formData = new FormData(); 
-  formData.append('file', file);
-  formData.append('model', document.getElementById('transcriptionModel').value);
-  if (document.getElementById('transcriptionLanguage').value != "") {
-    formData.append('language', document.getElementById('transcriptionLanguage').value)
-  }
-  if (document.getElementById('transcriptionPrompt').value != "") {
-    formData.append('prompt', document.getElementById('transcriptionPrompt').value)
-  }
-  request.setRequestHeader('Authorization', `Bearer ${localStorage.getItem("apiKey")}`)
-  request.setRequestHeader("Accept", "application/json");
-  $("body").css("cursor", "progress");
-  logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
-  request.send(formData);
-  document.getElementById('transcription-file-selector').value = null;
-  document.getElementById('transcriptionLanguage').value = "";
-  document.getElementById('transcriptionPrompt').value = "";
-};
-
-const translateFile = file => {
-  console.log("Uploading file to OpenAI...");          
-  const request = new XMLHttpRequest();         
-  request.open("POST", TRANSLATION_URL, true);
-  request.onreadystatechange = () => {
-    if (request.readyState === 4 && request.status === 200) {
-      console.log(request.responseText);
-      let jsonRequest = JSON.parse(request.responseText);
-      addResponse(TEXT, `English Translation: ${jsonRequest.text}`);
-      logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
-      $("body").css("cursor", "default");
-    } else {
-      $("body").css("cursor", "default");
-      if (request.status != 200) {
-        logtotoast(TOAST_TYPE_DANGER, "Invalid File");
-      }
-    }
-  };
-  var formData = new FormData(); 
-  formData.append('file', file);
-  formData.append('model', document.getElementById('translationModel').value);
-  if (document.getElementById('translationPrompt').value != "") {
-    formData.append('prompt', document.getElementById('translationPrompt').value)
-  }
-  request.setRequestHeader('Authorization', `Bearer ${localStorage.getItem("apiKey")}`)
-  request.setRequestHeader("Accept", "application/json");
-  $("body").css("cursor", "progress");
-  logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
-  request.send(formData);
-  document.getElementById('translation-file-selector').value = null;
-  document.getElementById('translationPrompt').value = "";
-};
      
 const fileInput = document.querySelector("#file-selector");
   fileInput.addEventListener("change", event => {
@@ -286,10 +150,143 @@ function saveAPIKey() {
   console.log("Api key saved");
 }
 
-function clearAllChats() {
+function clearAllConsoles() {
   $("#console-log").val("");
+  $("#console-log span").remove();
   $("#image-list span").remove();
 }
+
+const uploadFile = file => {
+  console.log("Uploading file to OpenAI...");          
+  const request = new XMLHttpRequest();         
+  request.open("POST", VARIATIONS_URL, true);
+  request.onreadystatechange = () => {
+    if (request.readyState === 4 && request.status === 200) {
+      jsonResponse = JSON.parse(request.responseText);
+      for (i = 0; i < jsonResponse.data.length; i++) {
+        addResponse(IMAGE, jsonResponse.data[i].url);
+      }
+      logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
+      $("body").css("cursor", "default");
+    } else {
+      $("body").css("cursor", "default");
+      if (request.status != 200) {
+        logtotoast(TOAST_TYPE_DANGER, "Invalid Image");
+      }
+    }
+  };
+  var formData = new FormData(); 
+  formData.append('image', file);
+  formData.append('model', DALLE2);
+  formData.append('n', parseInt(document.getElementById("variationsnumber").value, 10));
+  request.setRequestHeader('Authorization', `Bearer ${localStorage.getItem("apiKey")}`)
+  request.setRequestHeader("Accept", "application/json");
+  $("body").css("cursor", "progress");
+  logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
+  request.send(formData);
+  document.getElementById('file-selector').value = null;
+};
+
+const editFile = file => {
+  console.log("Uploading file to OpenAI...");          
+  const request = new XMLHttpRequest();         
+  request.open("POST", EDITS_URL, true);
+  request.onreadystatechange = () => {
+    if (request.readyState === 4 && request.status === 200) {
+      jsonResponse = JSON.parse(request.responseText);
+      for (i = 0; i < jsonResponse.data.length; i++) {
+        addResponse(IMAGE, jsonResponse.data[i].url);
+      }
+      logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
+      $("body").css("cursor", "default");
+    } else {
+      $("body").css("cursor", "default");
+      if (request.status != 200) {
+        logtotoast(TOAST_TYPE_DANGER, "Invalid Image");
+      }
+    }
+  };
+  var formData = new FormData(); 
+  formData.append('image', file);
+  formData.append('model', DALLE2);
+  formData.append('prompt', document.getElementById("editDescription").value);
+  formData.append('n', parseInt(document.getElementById("editvariationsnumber").value, 10));
+  request.setRequestHeader('Authorization', `Bearer ${localStorage.getItem("apiKey")}`)
+  request.setRequestHeader("Accept", "application/json");
+  $("body").css("cursor", "progress");
+  logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
+  request.send(formData);
+  document.getElementById('edit-file-selector').value = null;
+  document.getElementById("editDescription").value = "";
+};
+
+const transcribeFile = file => {
+  console.log("Uploading file to OpenAI...");          
+  const request = new XMLHttpRequest();         
+  request.open("POST", TRANSCRIPTION_URL, true);
+  request.onreadystatechange = () => {
+    if (request.readyState === 4 && request.status === 200) {
+      let jsonRequest = JSON.parse(request.responseText);
+      addResponse(TEXT, `Transcription: ${jsonRequest.text}`);
+      logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
+      $("body").css("cursor", "default");
+    } else {
+      $("body").css("cursor", "default");
+      if (request.status != 200) {
+        logtotoast(TOAST_TYPE_DANGER, "Invalid File");
+      }
+    }
+  };
+  var formData = new FormData(); 
+  formData.append('file', file);
+  formData.append('model', document.getElementById('transcriptionModel').value);
+  if (document.getElementById('transcriptionLanguage').value != "") {
+    formData.append('language', document.getElementById('transcriptionLanguage').value)
+  }
+  if (document.getElementById('transcriptionPrompt').value != "") {
+    formData.append('prompt', document.getElementById('transcriptionPrompt').value)
+  }
+  request.setRequestHeader('Authorization', `Bearer ${localStorage.getItem("apiKey")}`)
+  request.setRequestHeader("Accept", "application/json");
+  $("body").css("cursor", "progress");
+  logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
+  request.send(formData);
+  document.getElementById('transcription-file-selector').value = null;
+  document.getElementById('transcriptionLanguage').value = "";
+  document.getElementById('transcriptionPrompt').value = "";
+};
+
+const translateFile = file => {
+  console.log("Uploading file to OpenAI...");          
+  const request = new XMLHttpRequest();         
+  request.open("POST", TRANSLATION_URL, true);
+  request.onreadystatechange = () => {
+    if (request.readyState === 4 && request.status === 200) {
+      let jsonRequest = JSON.parse(request.responseText);
+      addResponse(TEXT, `English Translation: ${jsonRequest.text}`);
+      logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
+      $("body").css("cursor", "default");
+    } else {
+      $("body").css("cursor", "default");
+      if (request.status != 200) {
+        logtotoast(TOAST_TYPE_DANGER, "Invalid File");
+      }
+    }
+  };
+  var formData = new FormData(); 
+  formData.append('file', file);
+  formData.append('model', document.getElementById('translationModel').value);
+  if (document.getElementById('translationPrompt').value != "") {
+    formData.append('prompt', document.getElementById('translationPrompt').value)
+  }
+  request.setRequestHeader('Authorization', `Bearer ${localStorage.getItem("apiKey")}`)
+  request.setRequestHeader("Accept", "application/json");
+  $("body").css("cursor", "progress");
+  logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
+  request.send(formData);
+  document.getElementById('translation-file-selector').value = null;
+  document.getElementById('translationPrompt').value = "";
+};
 
 async function callModeration(prompt, model) {
   $("#createModeration").prop("disabled", true);
@@ -379,7 +376,6 @@ async function callGPT(description, size, style, model, number) {
     },
     error: function (XMLHttpRequest, textStatus, errorThrown) {
       $("body").css("cursor", "default");
-      //   alert("Invalid image request");
       logtotoast(TOAST_TYPE_DANGER, JSON.parse(XMLHttpRequest.responseText).error.message);
       $("#createImage").prop("disabled", false);
       $(document.getElementById("createImage").querySelector('.spinner-border')).addClass("visually-hidden");
@@ -439,7 +435,6 @@ async function createTTS() {
 // Handle CreateImange function. Main function to call
 async function createImage() {
   var input = document.getElementById("imageDescription").value;
-
   if (input.trim() == "") {
     logtotoast(TOAST_TYPE_DANGER, "Image description required");
     //alert("Image description required.");

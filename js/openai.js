@@ -179,98 +179,61 @@ const fileInputTranscription = document.querySelector("#transcription-file-selec
     transcribeFile(files[0]);
 });
 
+function showOrHide(variations, edits, tts, transcription, translation, moderation, dalle) {
+  document.getElementById("variations-card").style.display = variations;
+  document.getElementById("edits-card").style.display = edits;
+  document.getElementById("tts-card").style.display = tts;
+  document.getElementById("transcription-card").style.display = transcription;
+  document.getElementById("translation-card").style.display = moderation;
+  document.getElementById("moderation-card").style.display = translation;
+  document.getElementById("dalle-card").style.display = dalle;
+}
+
 $('#dalle-tab').on('click', function (e) {
   e.preventDefault()
   $(this).tab('show')
-  document.getElementById("variations-card").style.display = "none";
-  document.getElementById("edits-card").style.display = "none";
-  document.getElementById("tts-card").style.display = "none";
-  document.getElementById("transcription-card").style.display = "none";
-  document.getElementById("translation-card").style.display = "none";
-  document.getElementById("moderation-card").style.display = "none";
-  document.getElementById("dalle-card").style.display = "block";
+  showOrHide("none", "none", "none", "none", "none", "none", "block");
 })
 
 $('#moderation-tab').on('click', function (e) {
   e.preventDefault()
   $(this).tab('show')
-  document.getElementById("variations-card").style.display = "none";
-  document.getElementById("edits-card").style.display = "none";
-  document.getElementById("tts-card").style.display = "none";
-  document.getElementById("transcription-card").style.display = "none";
-  document.getElementById("translation-card").style.display = "none";
-  document.getElementById("dalle-card").style.display = "none";
-  document.getElementById("moderation-card").style.display = "block";
+  showOrHide("none", "none", "none", "none", "none", "block", "none");
 })
 
 $('#translation-tab').on('click', function (e) {
   e.preventDefault()
-  $(this).tab('show')
-  document.getElementById("variations-card").style.display = "none";
-  document.getElementById("edits-card").style.display = "none";
-  document.getElementById("tts-card").style.display = "none";
-  document.getElementById("transcription-card").style.display = "none";
-  document.getElementById("dalle-card").style.display = "none";
-  document.getElementById("moderation-card").style.display = "none";
-  document.getElementById("translation-card").style.display = "block";
+  $(this).tab('show');
+  showOrHide("none", "none", "none", "none", "block", "none", "none");
 })
 
 $('#tts-tab').on('click', function (e) {
   e.preventDefault()
-  $(this).tab('show')
-  document.getElementById("dalle-card").style.display = "none";
-  document.getElementById("variations-card").style.display = "none";
-  document.getElementById("edits-card").style.display = "none";
-  document.getElementById("transcription-card").style.display = "none";
-  document.getElementById("translation-card").style.display = "none";
-  document.getElementById("moderation-card").style.display = "none";
-  document.getElementById("tts-card").style.display = "block";
+  $(this).tab('show');
+  showOrHide("none", "none", "block", "none", "none", "none", "none");
 })
 
 $('#transcription-tab').on('click', function (e) {
   e.preventDefault()
-  $(this).tab('show')
-  document.getElementById("dalle-card").style.display = "none";
-  document.getElementById("variations-card").style.display = "none";
-  document.getElementById("edits-card").style.display = "none";
-  document.getElementById("tts-card").style.display = "none";
-  document.getElementById("translation-card").style.display = "none";
-  document.getElementById("moderation-card").style.display = "none";
-  document.getElementById("transcription-card").style.display = "block";
+  $(this).tab('show');
+  showOrHide("none", "none", "none", "block", "none", "none", "none");
 })
 
 $('#variations-tab').on('click', function (e) {
   e.preventDefault()
-  $(this).tab('show')
-  document.getElementById("dalle-card").style.display = "none";
-  document.getElementById("edits-card").style.display = "none";
-  document.getElementById("tts-card").style.display = "none";
-  document.getElementById("transcription-card").style.display = "none";
-  document.getElementById("translation-card").style.display = "none";
-  document.getElementById("moderation-card").style.display = "none";
-  document.getElementById("variations-card").style.display = "block";
+  $(this).tab('show');
+  showOrHide("block", "none", "none", "none", "none", "none", "none");
 })
 
 $('#edits-tab').on('click', function (e) {
   e.preventDefault()
-  $(this).tab('show')
-  document.getElementById("dalle-card").style.display = "none";
-  document.getElementById("variations-card").style.display = "none";
-  document.getElementById("tts-card").style.display = "none";
-  document.getElementById("transcription-card").style.display = "none";
-  document.getElementById("translation-card").style.display = "none";
-  document.getElementById("moderation-card").style.display = "none";
-  document.getElementById("edits-card").style.display = "block";
+  $(this).tab('show');
+  showOrHide("none", "block", "none", "none", "none", "none", "none");
 })
 
 // Initialization function
 function init() {
-  document.getElementById("variations-card").style.display = "none";
-  document.getElementById("moderation-card").style.display = "none";
-  document.getElementById("tts-card").style.display = "none";
-  document.getElementById("edits-card").style.display = "none";
-  document.getElementById("transcription-card").style.display = "none";
-  document.getElementById("translation-card").style.display = "none";
+  showOrHide("none", "none", "none", "none", "none", "none", "block");
   var input = document.getElementById("imageDescription");
   var apiKeyInput = document.getElementById("apiKeyInput");
 

@@ -12,6 +12,11 @@ const TOAST_TYPE_Success = 3;
 const DALLE3 = "dall-e-3";
 const DALLE2 = "dall-e-2";
 
+const IMAGE = 1;
+const MODERATION = 2;
+const AUDIO = 3;
+const TEXT = 4;
+
 $(document).ready(init);
 
 const uploadFile = file => {
@@ -23,7 +28,7 @@ const uploadFile = file => {
       console.log(request.responseText);
       jsonResponse = JSON.parse(request.responseText);
       for (i = 0; i < jsonResponse.data.length; i++) {
-        addImageToConsole(jsonResponse.data[i].url);
+        addResponse(IMAGE, jsonResponse.data[i].url);
       }
       logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
       $("body").css("cursor", "default");
@@ -55,7 +60,7 @@ const editFile = file => {
       console.log(request.responseText);
       jsonResponse = JSON.parse(request.responseText);
       for (i = 0; i < jsonResponse.data.length; i++) {
-        addImageToConsole(jsonResponse.data[i].url);
+        addResponse(IMAGE, jsonResponse.data[i].url);
       }
       logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
       $("body").css("cursor", "default");
@@ -88,7 +93,7 @@ const transcribeFile = file => {
     if (request.readyState === 4 && request.status === 200) {
       console.log(request.responseText);
       let jsonRequest = JSON.parse(request.responseText);
-      addTextToConsole(`Transcription: ${jsonRequest.text}`,"Agent");
+      addResponse(TEXT, `Transcription: ${jsonRequest.text}`);
       logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
       $("body").css("cursor", "default");
     } else {
@@ -125,7 +130,7 @@ const translateFile = file => {
     if (request.readyState === 4 && request.status === 200) {
       console.log(request.responseText);
       let jsonRequest = JSON.parse(request.responseText);
-      addTextToConsole(`English Translation: ${jsonRequest.text}`,"Agent");
+      addResponse(TEXT, `English Translation: ${jsonRequest.text}`);
       logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
       $("body").css("cursor", "default");
     } else {
@@ -351,7 +356,7 @@ async function callModeration(prompt, model) {
       logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
 
       $("body").css("cursor", "default");
-      addJsonToConsole(msg.results)
+      addResponse(MODERATION, msg.results)
 
       $("#createModeration").prop("disabled", false);
       $(document.getElementById("createModeration").querySelector('.spinner-border')).addClass("visually-hidden");
@@ -401,7 +406,7 @@ async function callGPT(description, size, style, model, number) {
       }
       logtotoast(TOAST_TYPE_PRIMARY, "Loading Image...");
       for (i = 0; i < msg.data.length; i++) {
-        addImageToConsole(`${msg.data[i].url}`);
+        addResponse(IMAGE, `${msg.data[i].url}`);
       }
 
       $("body").css("cursor", "default");
@@ -453,7 +458,7 @@ async function createTTS() {
   xhr.addEventListener("readystatechange", function() {
     if(this.readyState === 4) {
       logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
-      addSoundToConsole(window.URL.createObjectURL(this.response));
+      addResponse(AUDIO, window.URL.createObjectURL(this.response));
       $("#createTTS").prop("disabled", false);
       $(document.getElementById("createTTS").querySelector('.spinner-border')).addClass("visually-hidden");
     }
@@ -466,30 +471,6 @@ async function createTTS() {
   logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
   xhr.send(data);
   document.getElementById('ttsDescription').value = "";
-}
-
-function addSoundToConsole(url) {
-  var span = createSoundElement(url);
-  $("#image-list").append(span);
-  document.getElementById("image-list").scrollTop =
-    document.getElementById("image-list").scrollHeight;
-}
-
-// Create Image HTML nodes
-function createSoundElement(url) {
-  var span = document.createElement("span");
-  $(span).addClass("log-element-agent");
-  $(span).addClass("p-2");
-  var sendSpan = document.createElement("span");
-  $(sendSpan).addClass("log-element-sender");
-  //sendSpan.innerHTML = `<audio controls src="${url}" type="audio/mpeg"></audio>`;
-  sendSpan.innerHTML = `<audio style="border:10px solid lightsalmon;border-radius: 50px;" controls><source src="${url}" type="audio/mpeg"></audio>`;
-  console.log(sendSpan.innerHTML)
-  var msgSpan = document.createElement("span");
-  $(msgSpan).addClass("log-element-msg");
-  $(span).append(sendSpan);
-  $(span).append(msgSpan);
-  return span;
 }
 
 // Handle CreateImange function. Main function to call
@@ -511,102 +492,82 @@ async function createImage() {
   }
 }
 
-// Add Image HTML elements to console div
-function addImageToConsole(url) {
-  var span = createImageElement(url);
+function addResponse(type, msg) {
+  var span = createElement(type, msg);
   $("#image-list").append(span);
-  document.getElementById("image-list").scrollTop =
-    document.getElementById("image-list").scrollHeight;
+  document.getElementById("image-list").scrollTop = document.getElementById("image-list").scrollHeight;
 }
 
-// Create Image HTML nodes
-function createImageElement(url) {
-  var span = document.createElement("span");
-  $(span).addClass("log-element-agent");
-  $(span).addClass("p-2");
-  var sendSpan = document.createElement("span");
-  $(sendSpan).addClass("log-element-sender");
-  sendSpan.innerHTML = `<img src="${url}" alt="" width="100%" height="100%">`;
-  var msgSpan = document.createElement("span");
-  $(msgSpan).addClass("log-element-msg");
-  $(span).append(sendSpan);
-  $(span).append(msgSpan);
-  return span;
-}
-
-
-function writeToTrace(text, requestor) {
-  text = text.trim();
-  addToConsole(text, requestor);
-}
-
-function addJsonToConsole(msg) {
-  var span = createJsonElement(msg);
-  $("#image-list").append(span);
-  document.getElementById("image-list").scrollTop =
-    document.getElementById("image-list").scrollHeight;
-}
-
-function createJsonElement(msg) {
-  var span = document.createElement("span");
-  $(span).addClass("log-element-agent");
-  $(span).addClass("p-2");
-  var sendSpan = document.createElement("span");
-  $(sendSpan).addClass("log-element-sender");
-  sendSpan.innerHTML = `<pre id="json-data">${JSON.stringify(msg, null, 2)}</pre>`;
-  var msgSpan = document.createElement("span");
-  $(msgSpan).addClass("log-element-msg");
-  $(span).append(sendSpan);
-  $(span).append(msgSpan);
-  return span;
-}
-
-function addTextToConsole(msg, requestor) {
-  var span = createTextElement(msg, requestor);
-  $("#image-list").append(span);
-  document.getElementById("image-list").scrollTop =
-    document.getElementById("image-list").scrollHeight;
-}
-
-function createTextElement(msg, type) {
-  var span = document.createElement("span");
-  if (type == "User") {
-    $(span).addClass("log-element");
-  } else {
+function createElement(type, msg) {
+  if (type == AUDIO) {
+    var span = document.createElement("span");
     $(span).addClass("log-element-agent");
-  }
-  $(span).addClass("p-2");
-
-  var msgArray = msg.split(":");
-  var sender = msgArray[0];
-  var restMsg = "";
-
-  for (var i = 1; i < msgArray.length; i++) {
-    if (i == 1) {
-      restMsg += " " + msgArray[i];
-    } else {
-      restMsg += ":" + msgArray[i];
+    $(span).addClass("p-2");
+    var sendSpan = document.createElement("span");
+    $(sendSpan).addClass("log-element-sender");
+    //sendSpan.innerHTML = `<audio controls src="${url}" type="audio/mpeg"></audio>`;
+    sendSpan.innerHTML = `<audio style="border:10px solid lightsalmon;border-radius: 50px;" controls><source src="${msg}" type="audio/mpeg"></audio>`;
+    console.log(sendSpan.innerHTML)
+    var msgSpan = document.createElement("span");
+    $(msgSpan).addClass("log-element-msg");
+    $(span).append(sendSpan);
+    $(span).append(msgSpan);
+    return span;
+  } else if (type == IMAGE) {
+    var span = document.createElement("span");
+    $(span).addClass("log-element-agent");
+    $(span).addClass("p-2");
+    var sendSpan = document.createElement("span");
+    $(sendSpan).addClass("log-element-sender");
+    sendSpan.innerHTML = `<img src="${msg}" alt="" width="100%" height="100%">`;
+    var msgSpan = document.createElement("span");
+    $(msgSpan).addClass("log-element-msg");
+    $(span).append(sendSpan);
+    $(span).append(msgSpan);
+    return span;
+  } else if (type == MODERATION) {
+    var span = document.createElement("span");
+    $(span).addClass("log-element-agent");
+    $(span).addClass("p-2");
+    var sendSpan = document.createElement("span");
+    $(sendSpan).addClass("log-element-sender");
+    sendSpan.innerHTML = `<pre id="json-data">${JSON.stringify(msg, null, 2)}</pre>`;
+    var msgSpan = document.createElement("span");
+    $(msgSpan).addClass("log-element-msg");
+    $(span).append(sendSpan);
+    $(span).append(msgSpan);
+    return span;
+  } else if (type == TEXT) {
+    var span = document.createElement("span");
+    $(span).addClass("log-element-agent");
+    $(span).addClass("p-2"); 
+    var msgArray = msg.split(":");
+    var sender = msgArray[0];
+    var restMsg = ""; 
+    for (var i = 1; i < msgArray.length; i++) {
+      if (i == 1) {
+        restMsg += " " + msgArray[i];
+      } else {
+        restMsg += ":" + msgArray[i];
+      }
     }
+    var sendSpan = document.createElement("span");
+    $(sendSpan).addClass("log-element-sender");
+    sendSpan.innerHTML = sender + ":";
+    var msgSpan = document.createElement("span");
+    $(msgSpan).addClass("log-element-msg");
+    restMsg = restMsg.replaceAll(`\n`, `<BR>`);
+    $(msgSpan).append(restMsg);
+    $(span).append(sendSpan);
+    $(span).append(msgSpan);
+    return span;   
   }
-
-  var sendSpan = document.createElement("span");
-
-  $(sendSpan).addClass("log-element-sender");
-  sendSpan.innerHTML = sender + ":";
-  var msgSpan = document.createElement("span");
-  $(msgSpan).addClass("log-element-msg");
-  restMsg = restMsg.replaceAll(`\n`, `<BR>`);
-  $(msgSpan).append(restMsg);
-  $(span).append(sendSpan);
-  $(span).append(msgSpan);
-  return span;
 }
 
 function addToConsole(msg, requestor) {
   var span = createLogElement(msg, requestor);
   $("#console-log").append(span);
-  document.getElementById("console-log").scrollTop =
-    document.getElementById("console-log").scrollHeight;
+  document.getElementById("console-log").scrollTop = document.getElementById("console-log").scrollHeight;
 }
 
 function createLogElement(msg, type) {

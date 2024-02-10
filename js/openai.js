@@ -5,17 +5,21 @@ const TTS_URL = "https://api.openai.com/v1/audio/speech";
 const TRANSCRIPTION_URL = "https://api.openai.com/v1/audio/transcriptions";
 const TRANSLATION_URL = "https://api.openai.com/v1/audio/translations";
 const MODERATION_URL = "https://api.openai.com/v1/moderations";
+const OPEN_AI_CHAT_URL = "https://api.openai.com/v1/chat/completions";
 const TOAST_TYPE_PRIMARY = 1;
 const TOAST_TYPE_DANGER = 2;
-const TOAST_TYPE_Success = 3;
+const TOAST_TYPE_SUCCESS = 3;
 
 const DALLE3 = "dall-e-3";
 const DALLE2 = "dall-e-2";
+const GPT4 = "gpt-4-1106-preview";
 
 const IMAGE = 1;
 const MODERATION = 2;
 const AUDIO = 3;
 const TEXT = 4;
+
+var gptConversation = [];
 
 $(document).ready(init);
      
@@ -43,7 +47,7 @@ const fileInputTranscription = document.querySelector("#transcription-file-selec
     transcribeFile(files[0]);
 });
 
-function showOrHide(variations, edits, tts, transcription, translation, moderation, dalle) {
+function showOrHide(variations, edits, tts, transcription, translation, moderation, dalle, chat) {
   document.getElementById("variations-card").style.display = variations;
   document.getElementById("edits-card").style.display = edits;
   document.getElementById("tts-card").style.display = tts;
@@ -51,57 +55,66 @@ function showOrHide(variations, edits, tts, transcription, translation, moderati
   document.getElementById("moderation-card").style.display = moderation;
   document.getElementById("translation-card").style.display = translation;
   document.getElementById("dalle-card").style.display = dalle;
+  document.getElementById("chat-card").style.display = chat;
 }
 
 $('#dalle-tab').on('click', function (e) {
   e.preventDefault()
   $(this).tab('show')
-  showOrHide("none", "none", "none", "none", "none", "none", "block");
+  showOrHide("none", "none", "none", "none", "none", "none", "block", "none");
+})
+
+$('#chat-tab').on('click', function (e) {
+  e.preventDefault()
+  $(this).tab('show')
+  showOrHide("none", "none", "none", "none", "none", "none", "none", "block");
 })
 
 $('#moderation-tab').on('click', function (e) {
   e.preventDefault()
   $(this).tab('show')
-  showOrHide("none", "none", "none", "none", "none", "block", "none");
+  showOrHide("none", "none", "none", "none", "none", "block", "none", "none");
 })
 
 $('#translation-tab').on('click', function (e) {
   e.preventDefault()
   $(this).tab('show');
-  showOrHide("none", "none", "none", "none", "block", "none", "none");
+  showOrHide("none", "none", "none", "none", "block", "none", "none", "none");
 })
 
 $('#tts-tab').on('click', function (e) {
   e.preventDefault()
   $(this).tab('show');
-  showOrHide("none", "none", "block", "none", "none", "none", "none");
+  showOrHide("none", "none", "block", "none", "none", "none", "none", "none");
 })
 
 $('#transcription-tab').on('click', function (e) {
   e.preventDefault()
   $(this).tab('show');
-  showOrHide("none", "none", "none", "block", "none", "none", "none");
+  showOrHide("none", "none", "none", "block", "none", "none", "none", "none");
 })
 
 $('#variations-tab').on('click', function (e) {
   e.preventDefault()
   $(this).tab('show');
-  showOrHide("block", "none", "none", "none", "none", "none", "none");
+  showOrHide("block", "none", "none", "none", "none", "none", "none", "none");
 })
 
 $('#edits-tab').on('click', function (e) {
   e.preventDefault()
   $(this).tab('show');
-  showOrHide("none", "block", "none", "none", "none", "none", "none");
+  showOrHide("none", "block", "none", "none", "none", "none", "none", "none");
 })
 
 // Initialization function
 function init() {
-  showOrHide("none", "none", "none", "none", "none", "none", "block");
+  showOrHide("none", "none", "none", "none", "none", "none", "block", "none");
   var input = document.getElementById("imageDescription");
   var apiKeyInput = document.getElementById("apiKeyInput");
 
   apiKeyInput.value = localStorage.getItem("apiKey");
+
+  $('#sendChat').prop("disabled", true);
 
   input.addEventListener("keyup", function (event) {
     if (event.key === "Enter") {
@@ -126,7 +139,7 @@ function logtotoast(type, message) {
       const toastdg = bootstrap.Toast.getOrCreateInstance(toastdgEle);
       toastdg.show();
       break;
-    case TOAST_TYPE_Success:
+    case TOAST_TYPE_SUCCESS:
       var toastscEle = document.getElementById("toastsuccess");
       toastscEle.querySelector('.toast-body').innerHTML = message;
       //spinner-border spinner-border-sm visually-hidden
@@ -156,6 +169,59 @@ function clearAllConsoles() {
   $("#image-list span").remove();
 }
 
+async function setPrompt() {
+  var input = document.getElementById("systemPrompt").value;
+  if (input.trim() == "") {
+    logtotoast(TOAST_TYPE_DANGER, "System prompt required");
+  } else {
+    systemPrompt = document.getElementById('systemPrompt').value;
+    establishInitialResponse();  
+  }
+}
+
+async function sendChat() {
+  addResponse(TEXT, `User: ${document.getElementById('chatMessage').value}`)
+  var gptMessage = {
+    role: "user",
+    content: document.getElementById('chatMessage').value
+  }
+  gptConversation.push(gptMessage);
+
+
+  $("#sendChat").prop("disabled", true);
+  $(document.getElementById("sendChat").querySelector('.spinner-border')).removeClass("visually-hidden");
+  try {
+    initialPrompt = await callChatGPT(gptConversation);
+  } catch (e) {
+
+  }
+  $("#sendChat").prop("disabled", false);
+  $(document.getElementById("sendChat").querySelector('.spinner-border')).addClass("visually-hidden");
+  document.getElementById('chatMessage').value = "";
+}
+
+async function establishInitialResponse() {
+  gptConversation = [];
+  mytext = "";
+  var systemRole = `[{"role":"system", "content":"${systemPrompt}"}]`;
+  gptConversation = JSON.parse(systemRole);
+  var user = {
+    role: "user",
+    content: "Hello"
+  }
+  gptConversation.push(user);
+  $("#setPrompt").prop("disabled", true);
+  $(document.getElementById("setPrompt").querySelector('.spinner-border')).removeClass("visually-hidden");
+  try {
+    initialPrompt = await callChatGPT(gptConversation);
+  } catch (e) {
+
+  }
+  $("#setPrompt").prop("disabled", false);
+  $(document.getElementById("setPrompt").querySelector('.spinner-border')).addClass("visually-hidden");
+  $('#sendChat').prop("disabled", false);
+}
+
 const uploadFile = file => {
   console.log("Uploading file to OpenAI...");          
   const request = new XMLHttpRequest();         
@@ -166,7 +232,7 @@ const uploadFile = file => {
       for (i = 0; i < jsonResponse.data.length; i++) {
         addResponse(IMAGE, jsonResponse.data[i].url);
       }
-      logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
+      logtotoast(TOAST_TYPE_SUCCESS, "Request Completed Successfully");
       $("body").css("cursor", "default");
     } else {
       $("body").css("cursor", "default");
@@ -197,7 +263,7 @@ const editFile = file => {
       for (i = 0; i < jsonResponse.data.length; i++) {
         addResponse(IMAGE, jsonResponse.data[i].url);
       }
-      logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
+      logtotoast(TOAST_TYPE_SUCCESS, "Request Completed Successfully");
       $("body").css("cursor", "default");
     } else {
       $("body").css("cursor", "default");
@@ -228,7 +294,7 @@ const transcribeFile = file => {
     if (request.readyState === 4 && request.status === 200) {
       let jsonRequest = JSON.parse(request.responseText);
       addResponse(TEXT, `Transcription: ${jsonRequest.text}`);
-      logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
+      logtotoast(TOAST_TYPE_SUCCESS, "Request Completed Successfully");
       $("body").css("cursor", "default");
     } else {
       $("body").css("cursor", "default");
@@ -264,7 +330,7 @@ const translateFile = file => {
     if (request.readyState === 4 && request.status === 200) {
       let jsonRequest = JSON.parse(request.responseText);
       addResponse(TEXT, `English Translation: ${jsonRequest.text}`);
-      logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
+      logtotoast(TOAST_TYPE_SUCCESS, "Request Completed Successfully");
       $("body").css("cursor", "default");
     } else {
       $("body").css("cursor", "default");
@@ -313,7 +379,7 @@ async function callModeration(prompt, model) {
     },
 
     success: function (msg) {
-      logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
+      logtotoast(TOAST_TYPE_SUCCESS, "Request Completed Successfully");
 
       $("body").css("cursor", "default");
       addResponse(MODERATION, msg.results)
@@ -326,6 +392,45 @@ async function callModeration(prompt, model) {
       logtotoast(TOAST_TYPE_DANGER, "Invalid Moderation Promppt");
       $("#createModeration").prop("disabled", false);
       $(document.getElementById("createModeration").querySelector('.spinner-border')).addClass("visually-hidden");
+    },
+  });
+}
+
+async function callChatGPT(message) {
+  logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
+  const openAI = {
+    model: document.getElementById("chatModel").value,
+    messages: message,
+    max_tokens: 1200,
+    presence_penalty: 0.5,
+    frequency_penalty: 0.5,
+    temperature: 0
+  };
+
+  // Calling OpenAPI webservice
+  await $.ajax({
+    type: "POST",
+    url: OPEN_AI_CHAT_URL,
+    data: JSON.stringify(openAI),
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("apiKey")}`,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+
+    success: function (msg) {
+      logtotoast(TOAST_TYPE_SUCCESS, "Request Completed Successfully");
+      console.log(msg);
+      var gptMessage = {
+        role: "assistant",
+        content: msg.choices[0].message.content
+      }
+      gptConversation.push(gptMessage);
+      addResponse(TEXT, `Agent: ${msg.choices[0].message.content}`)
+    },
+    error: function (XMLHttpRequest, textStatus, errorThrown) {
+      $("body").css("cursor", "default");
+      logtotoast(TOAST_TYPE_DANGER, "OpenAI chat failure");
     },
   });
 }
@@ -360,7 +465,7 @@ async function callGPT(description, size, style, model, number) {
     },
 
     success: function (msg) {
-      logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
+      logtotoast(TOAST_TYPE_SUCCESS, "Request Completed Successfully");
       if (model != DALLE2) {
         addToConsole(`Image Description: ${msg.data[0].revised_prompt}`,"Agent");
       }
@@ -416,7 +521,7 @@ async function createTTS() {
 
   xhr.addEventListener("readystatechange", function() {
     if(this.readyState === 4) {
-      logtotoast(TOAST_TYPE_Success, "Request Completed Successfully");
+      logtotoast(TOAST_TYPE_SUCCESS, "Request Completed Successfully");
       addResponse(AUDIO, window.URL.createObjectURL(this.response));
       $("#createTTS").prop("disabled", false);
       $(document.getElementById("createTTS").querySelector('.spinner-border')).addClass("visually-hidden");
@@ -458,7 +563,16 @@ function addResponse(type, msg) {
 
 function createElement(type, msg) {
   var span = document.createElement("span");
-  $(span).addClass("log-element-agent");
+  console.log(msg);
+  if (type == TEXT) {
+    if (msg.startsWith("User")) {
+      $(span).addClass("log-element-user");
+    } else {
+      $(span).addClass("log-element-agent");
+    }
+  } else {
+    $(span).addClass("log-element-agent");
+  }
   $(span).addClass("p-2");
   var sendSpan = document.createElement("span");
   $(sendSpan).addClass("log-element-sender");
@@ -469,9 +583,6 @@ function createElement(type, msg) {
   } else if (type == MODERATION) {
     sendSpan.innerHTML = `<pre id="json-data">${JSON.stringify(msg, null, 2)}</pre>`;
   } else if (type == TEXT) {
-    var span = document.createElement("span");
-    $(span).addClass("log-element-agent");
-    $(span).addClass("p-2"); 
     var msgArray = msg.split(":");
     var sender = msgArray[0];
     var restMsg = ""; 

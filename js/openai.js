@@ -600,7 +600,7 @@ function createElement(type, msg) {
     var msgSpan = document.createElement("span");
     $(msgSpan).addClass("log-element-msg");
     restMsg = restMsg.replaceAll(`\n`, `<BR>`);
-    $(msgSpan).append(restMsg);
+    $(msgSpan).append(messageWithLink(restMsg));
     $(span).append(sendSpan);
     $(span).append(msgSpan);
     return span;   

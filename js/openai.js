@@ -122,6 +122,14 @@ function init() {
       document.getElementById("createImage").click();
     }
   });
+
+  input = document.getElementById("chatMessage");
+  input.addEventListener("keyup", function (event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      document.getElementById("sendChat").click();
+    }
+  });
 }
 
 function logtotoast(type, message) {
@@ -205,7 +213,12 @@ async function establishInitialResponse() {
   mytext = "";
   let adjustedPrompt = systemPrompt.replaceAll("\n", "\\n").replaceAll("\r", "\\r").replaceAll("\t", "\\t").replaceAll(`\'`, `\\'`).replaceAll('\"', '\\"');
   var systemRole = `[{"role":"system", "content":"${adjustedPrompt}"}]`;
-  gptConversation = JSON.parse(systemRole);
+  try {
+    gptConversation = JSON.parse(systemRole);
+  } catch(e) {
+    logtotoast(TOAST_TYPE_DANGER, "Unsupported characters in System Prompt");
+    return;
+  }
   var user = {
     role: "user",
     content: "Hello"
@@ -402,7 +415,7 @@ async function callChatGPT(message) {
   const openAI = {
     model: document.getElementById("chatModel").value,
     messages: message,
-    max_tokens: 1200,
+    max_tokens: 4096,
     presence_penalty: 0.5,
     frequency_penalty: 0.5,
     temperature: 0

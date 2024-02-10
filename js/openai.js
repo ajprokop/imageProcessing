@@ -203,7 +203,8 @@ async function sendChat() {
 async function establishInitialResponse() {
   gptConversation = [];
   mytext = "";
-  var systemRole = `[{"role":"system", "content":"${systemPrompt}"}]`;
+  let adjustedPrompt = systemPrompt.replaceAll("\n", "\\n").replaceAll("\r", "\\r");
+  var systemRole = `[{"role":"system", "content":"${adjustedPrompt}"}]`;
   gptConversation = JSON.parse(systemRole);
   var user = {
     role: "user",

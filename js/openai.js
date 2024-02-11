@@ -612,7 +612,8 @@ function createElement(type, msg) {
     sendSpan.innerHTML = sender + ":";
     var msgSpan = document.createElement("span");
     $(msgSpan).addClass("log-element-msg");
-    restMsg = restMsg.replaceAll(`\n`, `<BR>`).replaceAll(" ", "&nbsp;");
+    //restMsg = restMsg.replaceAll(`\n`, `<BR>`).replaceAll(" ", "&nbsp;");
+    restMsg = restMsg.replaceAll(`\n`, `<BR>`);
 
     $(msgSpan).append(messageWithLink(restMsg));
     $(span).append(sendSpan);

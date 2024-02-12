@@ -612,8 +612,17 @@ function createElement(type, msg) {
     sendSpan.innerHTML = sender + ":";
     var msgSpan = document.createElement("span");
     $(msgSpan).addClass("log-element-msg");
-    //restMsg = restMsg.replaceAll(`\n`, `<BR>`).replaceAll(" ", "&nbsp;");
+
     restMsg = restMsg.replaceAll(`\n`, `<BR>`);
+
+    // A kludge to handle leading spaces at the beginning of a line
+    restMsg = restMsg.replaceAll(`<BR>  `, `<BR>&nbsp;&nbsp;`);
+    restMsg = restMsg.replaceAll(`&nbsp;&nbsp; `, `&nbsp;&nbsp;&nbsp;&nbsp;`);
+    restMsg = restMsg.replaceAll(`&nbsp;&nbsp;&nbsp; `, `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`);
+    restMsg = restMsg.replaceAll(`&nbsp;&nbsp;&nbsp;&nbsp; `, `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`);
+    restMsg = restMsg.replaceAll(`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `, `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`);
+    restMsg = restMsg.replaceAll(`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `, `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`);
+    restMsg = restMsg.replaceAll(`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `, `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`);
 
     $(msgSpan).append(messageWithLink(restMsg));
     $(span).append(sendSpan);

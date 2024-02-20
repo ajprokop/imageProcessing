@@ -66,7 +66,6 @@ $('#dalle-tab').on('click', function (e) {
 })
 
 $('#analysis-tab').on('click', function (e) {
-  console.log("Analysis")
   e.preventDefault()
   $(this).tab('show')
   showOrHide("none", "none", "none", "none", "none", "none", "none", "none", "block");
@@ -412,7 +411,6 @@ async function callAnalyze(url, model) {
         }
       ]
     };
-    console.dir(openAI);
     await $.ajax({
       type: "POST",
       url: OPEN_AI_CHAT_URL,

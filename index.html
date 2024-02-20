@@ -75,6 +75,12 @@
               </a>
             </li>
             <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#" id="analysis-tab">
+                <span data-feather="home"> </span>
+                <i class="bi bi-text-center"></i> Analysis
+              </a>
+            </li>
+            <li class="nav-item">
               <a class="nav-link active" aria-current="page" href="#" id="moderation-tab">
                 <span data-feather="home"> </span>
                 <i class="bi bi-stoplights"></i> Moderation
@@ -306,6 +312,24 @@
                 <div style="padding-top: 5px;">
                   <button id="createModeration" class="btn btn-primary" onclick="createModeration()">
                     Create Moderation <span class="spinner-border spinner-border-sm visually-hidden"
+                      aria-hidden="true"></span>
+                  </button>
+                </div>
+              </div>
+              <div class="card-body" id="analysis-card" disabled>
+                <div>
+                  <label for="analysisModel" class="form-label">Model</label>
+                  <select id="analysisModel" class="form-select" aria-label="Default select example">
+                    <option value="gpt-4-vision-preview" selected>gpt-4-vision-preview</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="analysisURL" class="form-label">Image URL</label>
+                  <textarea placeholder="Image URL" class="form-control" id="analysisURL" rows="1"></textarea>
+                </div>
+                <div style="padding-top: 5px;">
+                  <button id="analyzeImage" class="btn btn-primary" onclick="analyzeImage()">
+                    Analyze Image <span class="spinner-border spinner-border-sm visually-hidden"
                       aria-hidden="true"></span>
                   </button>
                 </div>

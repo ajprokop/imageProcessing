@@ -47,7 +47,7 @@ const fileInputTranscription = document.querySelector("#transcription-file-selec
     transcribeFile(files[0]);
 });
 
-function showOrHide(variations, edits, tts, transcription, translation, moderation, dalle, chat) {
+function showOrHide(variations, edits, tts, transcription, translation, moderation, dalle, chat, analysis) {
   document.getElementById("variations-card").style.display = variations;
   document.getElementById("edits-card").style.display = edits;
   document.getElementById("tts-card").style.display = tts;
@@ -56,59 +56,67 @@ function showOrHide(variations, edits, tts, transcription, translation, moderati
   document.getElementById("translation-card").style.display = translation;
   document.getElementById("dalle-card").style.display = dalle;
   document.getElementById("chat-card").style.display = chat;
+  document.getElementById("analysis-card").style.display = analysis;
 }
 
 $('#dalle-tab').on('click', function (e) {
   e.preventDefault()
   $(this).tab('show')
-  showOrHide("none", "none", "none", "none", "none", "none", "block", "none");
+  showOrHide("none", "none", "none", "none", "none", "none", "block", "none", "none");
+})
+
+$('#analysis-tab').on('click', function (e) {
+  console.log("Analysis")
+  e.preventDefault()
+  $(this).tab('show')
+  showOrHide("none", "none", "none", "none", "none", "none", "none", "none", "block");
 })
 
 $('#chat-tab').on('click', function (e) {
   e.preventDefault()
   $(this).tab('show')
-  showOrHide("none", "none", "none", "none", "none", "none", "none", "block");
+  showOrHide("none", "none", "none", "none", "none", "none", "none", "block", "none");
 })
 
 $('#moderation-tab').on('click', function (e) {
   e.preventDefault()
   $(this).tab('show')
-  showOrHide("none", "none", "none", "none", "none", "block", "none", "none");
+  showOrHide("none", "none", "none", "none", "none", "block", "none", "none", "none");
 })
 
 $('#translation-tab').on('click', function (e) {
   e.preventDefault()
   $(this).tab('show');
-  showOrHide("none", "none", "none", "none", "block", "none", "none", "none");
+  showOrHide("none", "none", "none", "none", "block", "none", "none", "none", "none");
 })
 
 $('#tts-tab').on('click', function (e) {
   e.preventDefault()
   $(this).tab('show');
-  showOrHide("none", "none", "block", "none", "none", "none", "none", "none");
+  showOrHide("none", "none", "block", "none", "none", "none", "none", "none", "none");
 })
 
 $('#transcription-tab').on('click', function (e) {
   e.preventDefault()
   $(this).tab('show');
-  showOrHide("none", "none", "none", "block", "none", "none", "none", "none");
+  showOrHide("none", "none", "none", "block", "none", "none", "none", "none", "none");
 })
 
 $('#variations-tab').on('click', function (e) {
   e.preventDefault()
   $(this).tab('show');
-  showOrHide("block", "none", "none", "none", "none", "none", "none", "none");
+  showOrHide("block", "none", "none", "none", "none", "none", "none", "none", "none");
 })
 
 $('#edits-tab').on('click', function (e) {
   e.preventDefault()
   $(this).tab('show');
-  showOrHide("none", "block", "none", "none", "none", "none", "none", "none");
+  showOrHide("none", "block", "none", "none", "none", "none", "none", "none", "none");
 })
 
 // Initialization function
 function init() {
-  showOrHide("none", "none", "none", "none", "none", "none", "block", "none");
+  showOrHide("none", "none", "none", "none", "none", "none", "block", "none", "none");
   var input = document.getElementById("imageDescription");
   var apiKeyInput = document.getElementById("apiKeyInput");
 
@@ -368,6 +376,71 @@ const translateFile = file => {
   document.getElementById('translationPrompt').value = "";
 };
 
+async function analyzeImage() {
+  var input = document.getElementById("analysisURL").value;
+
+  if (input.trim() == "") {
+    logtotoast(TOAST_TYPE_DANGER, "Analysis URL required");
+  } else {
+    response = await callAnalyze(
+      document.getElementById("analysisURL").value,
+      document.getElementById("analysisModel").value
+    );
+    document.getElementById("analysisURL").value = "";
+  } 
+}
+
+async function callAnalyze(url, model) {
+  $("#analyzeImage").prop("disabled", true);
+  $(document.getElementById("analyzeImage").querySelector('.spinner-border')).removeClass("visually-hidden");
+
+  $("body").css("cursor", "progress"); 
+  logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
+    // Calling OpenAPI webservice
+    const openAI = {
+      model: model,
+      max_tokens: 4096,
+      messages: [
+        {
+          role: "user",
+          content: [ 
+            {
+              type: "image_url",
+              image_url: {url: url}
+            }
+          ]
+        }
+      ]
+    };
+    console.dir(openAI);
+    await $.ajax({
+      type: "POST",
+      url: OPEN_AI_CHAT_URL,
+      data: JSON.stringify(openAI),
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("apiKey")}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+  
+      success: function (msg) {
+        logtotoast(TOAST_TYPE_SUCCESS, "Request Completed Successfully");
+  
+        $("body").css("cursor", "default");
+        addResponse(TEXT, `Agent: ${msg.choices[0].message.content}`);
+  
+        $("#analyzeImage").prop("disabled", false);
+        $(document.getElementById("analyzeImage").querySelector('.spinner-border')).addClass("visually-hidden");
+      },
+      error: function (XMLHttpRequest, textStatus, errorThrown) {
+        $("body").css("cursor", "default");
+        logtotoast(TOAST_TYPE_DANGER, "Invalid Analysis");
+        $("#analyzeImage").prop("disabled", false);
+        $(document.getElementById("analyzeImage").querySelector('.spinner-border')).addClass("visually-hidden");
+      },
+    });
+}
+
 async function callModeration(prompt, model) {
   $("#createModeration").prop("disabled", true);
   $(document.getElementById("createModeration").querySelector('.spinner-border')).removeClass("visually-hidden");
@@ -403,7 +476,7 @@ async function callModeration(prompt, model) {
     },
     error: function (XMLHttpRequest, textStatus, errorThrown) {
       $("body").css("cursor", "default");
-      logtotoast(TOAST_TYPE_DANGER, "Invalid Moderation Promppt");
+      logtotoast(TOAST_TYPE_DANGER, "Invalid Moderation Prompt");
       $("#createModeration").prop("disabled", false);
       $(document.getElementById("createModeration").querySelector('.spinner-border')).addClass("visually-hidden");
     },

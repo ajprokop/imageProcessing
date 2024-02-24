@@ -383,26 +383,36 @@ async function analyzeImage() {
   } else {
     response = await callAnalyze(
       document.getElementById("analysisURL").value,
+      document.getElementById("analysisPrompt").value,
       document.getElementById("analysisModel").value
     );
     document.getElementById("analysisURL").value = "";
+    document.getElementById("analysisPrompt").value = "";
   } 
 }
 
-async function callAnalyze(url, model) {
+async function callAnalyze(url, analysisPrompt, model) {
   $("#analyzeImage").prop("disabled", true);
   $(document.getElementById("analyzeImage").querySelector('.spinner-border')).removeClass("visually-hidden");
 
   $("body").css("cursor", "progress"); 
   logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
     // Calling OpenAPI webservice
+    let prompt = "Analyze this image";
+    if (analysisPrompt != "") {
+      prompt = analysisPrompt;
+    }
     const openAI = {
       model: model,
       max_tokens: 4096,
       messages: [
         {
           role: "user",
-          content: [ 
+          content: [
+            {
+              type: "text",
+              text: prompt
+            },
             {
               type: "image_url",
               image_url: {url: url}

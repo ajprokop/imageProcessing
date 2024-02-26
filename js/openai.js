@@ -22,148 +22,148 @@ const TEXT = 4;
 var gptConversation = [];
 
 $(document).ready(init);
-     
+
 const fileInput = document.querySelector("#file-selector");
-  fileInput.addEventListener("change", event => {
-    var files = event.target.files;
-    uploadFile(files[0]);
+fileInput.addEventListener("change", event => {
+   var files = event.target.files;
+   uploadFile(files[0]);
 });
 
 const fileInputEdit = document.querySelector("#edit-file-selector");
-  fileInputEdit.addEventListener("change", event => {
-    var files = event.target.files;
-    editFile(files[0]);
+fileInputEdit.addEventListener("change", event => {
+   var files = event.target.files;
+   editFile(files[0]);
 });
 
 const fileInputTranslation = document.querySelector("#translation-file-selector");
-  fileInputTranslation.addEventListener("change", event => {
-    var files = event.target.files;
-    translateFile(files[0]);
+fileInputTranslation.addEventListener("change", event => {
+   var files = event.target.files;
+   translateFile(files[0]);
 });
 
 const fileInputTranscription = document.querySelector("#transcription-file-selector");
-  fileInputTranscription.addEventListener("change", event => {
-    var files = event.target.files;
-    transcribeFile(files[0]);
+fileInputTranscription.addEventListener("change", event => {
+   var files = event.target.files;
+   transcribeFile(files[0]);
 });
 
 function showOrHide(variations, edits, tts, transcription, translation, moderation, dalle, chat, analysis) {
-  document.getElementById("variations-card").style.display = variations;
-  document.getElementById("edits-card").style.display = edits;
-  document.getElementById("tts-card").style.display = tts;
-  document.getElementById("transcription-card").style.display = transcription;
-  document.getElementById("moderation-card").style.display = moderation;
-  document.getElementById("translation-card").style.display = translation;
-  document.getElementById("dalle-card").style.display = dalle;
-  document.getElementById("chat-card").style.display = chat;
-  document.getElementById("analysis-card").style.display = analysis;
+   document.getElementById("variations-card").style.display = variations;
+   document.getElementById("edits-card").style.display = edits;
+   document.getElementById("tts-card").style.display = tts;
+   document.getElementById("transcription-card").style.display = transcription;
+   document.getElementById("moderation-card").style.display = moderation;
+   document.getElementById("translation-card").style.display = translation;
+   document.getElementById("dalle-card").style.display = dalle;
+   document.getElementById("chat-card").style.display = chat;
+   document.getElementById("analysis-card").style.display = analysis;
 }
 
 $('#dalle-tab').on('click', function (e) {
-  e.preventDefault()
-  $(this).tab('show')
-  showOrHide("none", "none", "none", "none", "none", "none", "block", "none", "none");
+   e.preventDefault()
+   $(this).tab('show')
+   showOrHide("none", "none", "none", "none", "none", "none", "block", "none", "none");
 })
 
 $('#analysis-tab').on('click', function (e) {
-  e.preventDefault()
-  $(this).tab('show')
-  showOrHide("none", "none", "none", "none", "none", "none", "none", "none", "block");
+   e.preventDefault()
+   $(this).tab('show')
+   showOrHide("none", "none", "none", "none", "none", "none", "none", "none", "block");
 })
 
 $('#chat-tab').on('click', function (e) {
-  e.preventDefault()
-  $(this).tab('show')
-  showOrHide("none", "none", "none", "none", "none", "none", "none", "block", "none");
+   e.preventDefault()
+   $(this).tab('show')
+   showOrHide("none", "none", "none", "none", "none", "none", "none", "block", "none");
 })
 
 $('#moderation-tab').on('click', function (e) {
-  e.preventDefault()
-  $(this).tab('show')
-  showOrHide("none", "none", "none", "none", "none", "block", "none", "none", "none");
+   e.preventDefault()
+   $(this).tab('show')
+   showOrHide("none", "none", "none", "none", "none", "block", "none", "none", "none");
 })
 
 $('#translation-tab').on('click', function (e) {
-  e.preventDefault()
-  $(this).tab('show');
-  showOrHide("none", "none", "none", "none", "block", "none", "none", "none", "none");
+   e.preventDefault()
+   $(this).tab('show');
+   showOrHide("none", "none", "none", "none", "block", "none", "none", "none", "none");
 })
 
 $('#tts-tab').on('click', function (e) {
-  e.preventDefault()
-  $(this).tab('show');
-  showOrHide("none", "none", "block", "none", "none", "none", "none", "none", "none");
+   e.preventDefault()
+   $(this).tab('show');
+   showOrHide("none", "none", "block", "none", "none", "none", "none", "none", "none");
 })
 
 $('#transcription-tab').on('click', function (e) {
-  e.preventDefault()
-  $(this).tab('show');
-  showOrHide("none", "none", "none", "block", "none", "none", "none", "none", "none");
+   e.preventDefault()
+   $(this).tab('show');
+   showOrHide("none", "none", "none", "block", "none", "none", "none", "none", "none");
 })
 
 $('#variations-tab').on('click', function (e) {
-  e.preventDefault()
-  $(this).tab('show');
-  showOrHide("block", "none", "none", "none", "none", "none", "none", "none", "none");
+   e.preventDefault()
+   $(this).tab('show');
+   showOrHide("block", "none", "none", "none", "none", "none", "none", "none", "none");
 })
 
 $('#edits-tab').on('click', function (e) {
-  e.preventDefault()
-  $(this).tab('show');
-  showOrHide("none", "block", "none", "none", "none", "none", "none", "none", "none");
+   e.preventDefault()
+   $(this).tab('show');
+   showOrHide("none", "block", "none", "none", "none", "none", "none", "none", "none");
 })
 
 // Initialization function
 function init() {
-  showOrHide("none", "none", "none", "none", "none", "none", "block", "none", "none");
-  var input = document.getElementById("imageDescription");
-  var apiKeyInput = document.getElementById("apiKeyInput");
+   showOrHide("none", "none", "none", "none", "none", "none", "block", "none", "none");
+   var input = document.getElementById("imageDescription");
+   var apiKeyInput = document.getElementById("apiKeyInput");
 
-  apiKeyInput.value = localStorage.getItem("apiKey");
+   apiKeyInput.value = localStorage.getItem("apiKey");
 
-  $('#sendChat').prop("disabled", true);
+   $('#sendChat').prop("disabled", true);
 
-  input.addEventListener("keyup", function (event) {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      document.getElementById("createImage").click();
-    }
-  });
+   input.addEventListener("keyup", function (event) {
+      if (event.key === "Enter") {
+         event.preventDefault();
+         document.getElementById("createImage").click();
+      }
+   });
 
-  input = document.getElementById("chatMessage");
-  input.addEventListener("keyup", function (event) {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      document.getElementById("sendChat").click();
-    }
-  });
+   input = document.getElementById("chatMessage");
+   input.addEventListener("keyup", function (event) {
+      if (event.key === "Enter") {
+         event.preventDefault();
+         document.getElementById("sendChat").click();
+      }
+   });
 }
 
 function logtotoast(type, message) {
-  switch (type) {
-    case TOAST_TYPE_PRIMARY:
-      var toastEle = document.getElementById("toastprimary");
-      toastEle.querySelector('.toast-body').innerHTML = message;
-      const toastPri = bootstrap.Toast.getOrCreateInstance(toastEle);
-      toastPri.show();
-      break;
-    case TOAST_TYPE_DANGER:
-      var toastdgEle = document.getElementById("toastdanger");
-      toastdgEle.querySelector('.toast-body').innerHTML = message;
-      //spinner-border spinner-border-sm visually-hidden
-      const toastdg = bootstrap.Toast.getOrCreateInstance(toastdgEle);
-      toastdg.show();
-      break;
-    case TOAST_TYPE_SUCCESS:
-      var toastscEle = document.getElementById("toastsuccess");
-      toastscEle.querySelector('.toast-body').innerHTML = message;
-      //spinner-border spinner-border-sm visually-hidden
-      const toastsc = bootstrap.Toast.getOrCreateInstance(toastscEle);
-      toastsc.show();
-      break;
-    default:
-      console.log('');
-  }
+   switch (type) {
+      case TOAST_TYPE_PRIMARY:
+         var toastEle = document.getElementById("toastprimary");
+         toastEle.querySelector('.toast-body').innerHTML = message;
+         const toastPri = bootstrap.Toast.getOrCreateInstance(toastEle);
+         toastPri.show();
+         break;
+      case TOAST_TYPE_DANGER:
+         var toastdgEle = document.getElementById("toastdanger");
+         toastdgEle.querySelector('.toast-body').innerHTML = message;
+         //spinner-border spinner-border-sm visually-hidden
+         const toastdg = bootstrap.Toast.getOrCreateInstance(toastdgEle);
+         toastdg.show();
+         break;
+      case TOAST_TYPE_SUCCESS:
+         var toastscEle = document.getElementById("toastsuccess");
+         toastscEle.querySelector('.toast-body').innerHTML = message;
+         //spinner-border spinner-border-sm visually-hidden
+         const toastsc = bootstrap.Toast.getOrCreateInstance(toastscEle);
+         toastsc.show();
+         break;
+      default:
+         console.log('');
+   }
 }
 
 /**
@@ -173,599 +173,597 @@ function logtotoast(type, message) {
  * Note : Saving API key in local storage can be cause security vulnerability. Use alternate approach for production.
  */
 function saveAPIKey() {
-  var apiKey = document.getElementById("apiKeyInput");
-  localStorage.setItem("apiKey", apiKey.value);
-  console.log("Api key saved");
+   var apiKey = document.getElementById("apiKeyInput");
+   localStorage.setItem("apiKey", apiKey.value);
+   console.log("Api key saved");
 }
 
 function clearAllConsoles() {
-  $("#console-log").val("");
-  $("#console-log span").remove();
-  $("#image-list span").remove();
+   $("#console-log").val("");
+   $("#console-log span").remove();
+   $("#image-list span").remove();
 }
 
 async function setPrompt() {
-  var input = document.getElementById("systemPrompt").value;
-  if (input.trim() == "") {
-    logtotoast(TOAST_TYPE_DANGER, "System prompt required");
-  } else {
-    systemPrompt = document.getElementById('systemPrompt').value;
-    establishInitialResponse();  
-  }
+   var input = document.getElementById("systemPrompt").value;
+   if (input.trim() == "") {
+      logtotoast(TOAST_TYPE_DANGER, "System prompt required");
+   } else {
+      systemPrompt = document.getElementById('systemPrompt').value;
+      establishInitialResponse();
+   }
 }
 
 async function sendChat() {
-  addResponse(TEXT, `User: ${document.getElementById('chatMessage').value}`)
-  var gptMessage = {
-    role: "user",
-    content: document.getElementById('chatMessage').value
-  }
-  gptConversation.push(gptMessage);
+   addResponse(TEXT, `User: ${document.getElementById('chatMessage').value}`)
+   var gptMessage = {
+      role: "user",
+      content: document.getElementById('chatMessage').value
+   }
+   gptConversation.push(gptMessage);
 
 
-  $("#sendChat").prop("disabled", true);
-  $(document.getElementById("sendChat").querySelector('.spinner-border')).removeClass("visually-hidden");
-  try {
-    initialPrompt = await callChatGPT(gptConversation);
-  } catch (e) {
+   $("#sendChat").prop("disabled", true);
+   $(document.getElementById("sendChat").querySelector('.spinner-border')).removeClass("visually-hidden");
+   try {
+      initialPrompt = await callChatGPT(gptConversation);
+   } catch (e) {
 
-  }
-  $("#sendChat").prop("disabled", false);
-  $(document.getElementById("sendChat").querySelector('.spinner-border')).addClass("visually-hidden");
-  document.getElementById('chatMessage').value = "";
+   }
+   $("#sendChat").prop("disabled", false);
+   $(document.getElementById("sendChat").querySelector('.spinner-border')).addClass("visually-hidden");
+   document.getElementById('chatMessage').value = "";
 }
 
 async function establishInitialResponse() {
-  gptConversation = [];
-  mytext = "";
-  let adjustedPrompt = systemPrompt.replaceAll("\n", "\\n").replaceAll("\r", "\\r").replaceAll("\t", "\\t").replaceAll(`\'`, `\\'`).replaceAll('\"', '\\"');
-  var systemRole = `[{"role":"system", "content":"${adjustedPrompt}"}]`;
-  try {
-    gptConversation = JSON.parse(systemRole);
-  } catch(e) {
-    logtotoast(TOAST_TYPE_DANGER, "Unsupported characters in System Prompt");
-    return;
-  }
-  var user = {
-    role: "user",
-    content: "Hello"
-  }
-  gptConversation.push(user);
-  $("#setPrompt").prop("disabled", true);
-  $(document.getElementById("setPrompt").querySelector('.spinner-border')).removeClass("visually-hidden");
-  try {
-    initialPrompt = await callChatGPT(gptConversation);
-  } catch (e) {
+   gptConversation = [];
+   mytext = "";
+   let adjustedPrompt = systemPrompt.replaceAll("\n", "\\n").replaceAll("\r", "\\r").replaceAll("\t", "\\t").replaceAll(`\'`, `\\'`).replaceAll('\"', '\\"');
+   var systemRole = `[{"role":"system", "content":"${adjustedPrompt}"}]`;
+   try {
+      gptConversation = JSON.parse(systemRole);
+   } catch (e) {
+      logtotoast(TOAST_TYPE_DANGER, "Unsupported characters in System Prompt");
+      return;
+   }
+   var user = {
+      role: "user",
+      content: "Hello"
+   }
+   gptConversation.push(user);
+   $("#setPrompt").prop("disabled", true);
+   $(document.getElementById("setPrompt").querySelector('.spinner-border')).removeClass("visually-hidden");
+   try {
+      initialPrompt = await callChatGPT(gptConversation);
+   } catch (e) {
 
-  }
-  $("#setPrompt").prop("disabled", false);
-  $(document.getElementById("setPrompt").querySelector('.spinner-border')).addClass("visually-hidden");
-  $('#sendChat').prop("disabled", false);
+   }
+   $("#setPrompt").prop("disabled", false);
+   $(document.getElementById("setPrompt").querySelector('.spinner-border')).addClass("visually-hidden");
+   $('#sendChat').prop("disabled", false);
 }
 
 const uploadFile = file => {
-  console.log("Uploading file to OpenAI...");          
-  const request = new XMLHttpRequest();         
-  request.open("POST", VARIATIONS_URL, true);
-  request.onreadystatechange = () => {
-    if (request.readyState === 4 && request.status === 200) {
-      jsonResponse = JSON.parse(request.responseText);
-      for (i = 0; i < jsonResponse.data.length; i++) {
-        addResponse(IMAGE, jsonResponse.data[i].url);
+   console.log("Uploading file to OpenAI...");
+   const request = new XMLHttpRequest();
+   request.open("POST", VARIATIONS_URL, true);
+   request.onreadystatechange = () => {
+      if (request.readyState === 4 && request.status === 200) {
+         jsonResponse = JSON.parse(request.responseText);
+         for (i = 0; i < jsonResponse.data.length; i++) {
+            addResponse(IMAGE, jsonResponse.data[i].url);
+         }
+         logtotoast(TOAST_TYPE_SUCCESS, "Request Completed Successfully");
+         $("body").css("cursor", "default");
+      } else {
+         $("body").css("cursor", "default");
+         if (request.status != 200) {
+            logtotoast(TOAST_TYPE_DANGER, "Invalid Image");
+         }
       }
-      logtotoast(TOAST_TYPE_SUCCESS, "Request Completed Successfully");
-      $("body").css("cursor", "default");
-    } else {
-      $("body").css("cursor", "default");
-      if (request.status != 200) {
-        logtotoast(TOAST_TYPE_DANGER, "Invalid Image");
-      }
-    }
-  };
-  var formData = new FormData(); 
-  formData.append('image', file);
-  formData.append('model', DALLE2);
-  formData.append('n', parseInt(document.getElementById("variationsnumber").value, 10));
-  request.setRequestHeader('Authorization', `Bearer ${localStorage.getItem("apiKey")}`)
-  request.setRequestHeader("Accept", "application/json");
-  $("body").css("cursor", "progress");
-  logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
-  request.send(formData);
-  document.getElementById('file-selector').value = null;
+   };
+   var formData = new FormData();
+   formData.append('image', file);
+   formData.append('model', DALLE2);
+   formData.append('n', parseInt(document.getElementById("variationsnumber").value, 10));
+   request.setRequestHeader('Authorization', `Bearer ${localStorage.getItem("apiKey")}`)
+   request.setRequestHeader("Accept", "application/json");
+   $("body").css("cursor", "progress");
+   logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
+   request.send(formData);
+   document.getElementById('file-selector').value = null;
 };
 
 const editFile = file => {
-  console.log("Uploading file to OpenAI...");          
-  const request = new XMLHttpRequest();         
-  request.open("POST", EDITS_URL, true);
-  request.onreadystatechange = () => {
-    if (request.readyState === 4 && request.status === 200) {
-      jsonResponse = JSON.parse(request.responseText);
-      for (i = 0; i < jsonResponse.data.length; i++) {
-        addResponse(IMAGE, jsonResponse.data[i].url);
+   console.log("Uploading file to OpenAI...");
+   const request = new XMLHttpRequest();
+   request.open("POST", EDITS_URL, true);
+   request.onreadystatechange = () => {
+      if (request.readyState === 4 && request.status === 200) {
+         jsonResponse = JSON.parse(request.responseText);
+         for (i = 0; i < jsonResponse.data.length; i++) {
+            addResponse(IMAGE, jsonResponse.data[i].url);
+         }
+         logtotoast(TOAST_TYPE_SUCCESS, "Request Completed Successfully");
+         $("body").css("cursor", "default");
+      } else {
+         $("body").css("cursor", "default");
+         if (request.status != 200) {
+            logtotoast(TOAST_TYPE_DANGER, "Invalid Image");
+         }
       }
-      logtotoast(TOAST_TYPE_SUCCESS, "Request Completed Successfully");
-      $("body").css("cursor", "default");
-    } else {
-      $("body").css("cursor", "default");
-      if (request.status != 200) {
-        logtotoast(TOAST_TYPE_DANGER, "Invalid Image");
-      }
-    }
-  };
-  var formData = new FormData(); 
-  formData.append('image', file);
-  formData.append('model', DALLE2);
-  formData.append('prompt', document.getElementById("editDescription").value);
-  formData.append('n', parseInt(document.getElementById("editvariationsnumber").value, 10));
-  request.setRequestHeader('Authorization', `Bearer ${localStorage.getItem("apiKey")}`)
-  request.setRequestHeader("Accept", "application/json");
-  $("body").css("cursor", "progress");
-  logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
-  request.send(formData);
-  document.getElementById('edit-file-selector').value = null;
-  document.getElementById("editDescription").value = "";
+   };
+   var formData = new FormData();
+   formData.append('image', file);
+   formData.append('model', DALLE2);
+   formData.append('prompt', document.getElementById("editDescription").value);
+   formData.append('n', parseInt(document.getElementById("editvariationsnumber").value, 10));
+   request.setRequestHeader('Authorization', `Bearer ${localStorage.getItem("apiKey")}`)
+   request.setRequestHeader("Accept", "application/json");
+   $("body").css("cursor", "progress");
+   logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
+   request.send(formData);
+   document.getElementById('edit-file-selector').value = null;
+   document.getElementById("editDescription").value = "";
 };
 
 const transcribeFile = file => {
-  console.log("Uploading file to OpenAI...");          
-  const request = new XMLHttpRequest();         
-  request.open("POST", TRANSCRIPTION_URL, true);
-  request.onreadystatechange = () => {
-    if (request.readyState === 4 && request.status === 200) {
-      let jsonRequest = JSON.parse(request.responseText);
-      addResponse(TEXT, `Transcription: ${jsonRequest.text}`);
-      logtotoast(TOAST_TYPE_SUCCESS, "Request Completed Successfully");
-      $("body").css("cursor", "default");
-    } else {
-      $("body").css("cursor", "default");
-      if (request.status != 200) {
-        logtotoast(TOAST_TYPE_DANGER, "Invalid File");
+   console.log("Uploading file to OpenAI...");
+   const request = new XMLHttpRequest();
+   request.open("POST", TRANSCRIPTION_URL, true);
+   request.onreadystatechange = () => {
+      if (request.readyState === 4 && request.status === 200) {
+         let jsonRequest = JSON.parse(request.responseText);
+         addResponse(TEXT, `Transcription: ${jsonRequest.text}`);
+         logtotoast(TOAST_TYPE_SUCCESS, "Request Completed Successfully");
+         $("body").css("cursor", "default");
+      } else {
+         $("body").css("cursor", "default");
+         if (request.status != 200) {
+            logtotoast(TOAST_TYPE_DANGER, "Invalid File");
+         }
       }
-    }
-  };
-  var formData = new FormData(); 
-  formData.append('file', file);
-  formData.append('model', document.getElementById('transcriptionModel').value);
-  if (document.getElementById('transcriptionLanguage').value != "") {
-    formData.append('language', document.getElementById('transcriptionLanguage').value)
-  }
-  if (document.getElementById('transcriptionPrompt').value != "") {
-    formData.append('prompt', document.getElementById('transcriptionPrompt').value)
-  }
-  request.setRequestHeader('Authorization', `Bearer ${localStorage.getItem("apiKey")}`)
-  request.setRequestHeader("Accept", "application/json");
-  $("body").css("cursor", "progress");
-  logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
-  request.send(formData);
-  document.getElementById('transcription-file-selector').value = null;
-  document.getElementById('transcriptionLanguage').value = "";
-  document.getElementById('transcriptionPrompt').value = "";
+   };
+   var formData = new FormData();
+   formData.append('file', file);
+   formData.append('model', document.getElementById('transcriptionModel').value);
+   if (document.getElementById('transcriptionLanguage').value != "") {
+      formData.append('language', document.getElementById('transcriptionLanguage').value)
+   }
+   if (document.getElementById('transcriptionPrompt').value != "") {
+      formData.append('prompt', document.getElementById('transcriptionPrompt').value)
+   }
+   request.setRequestHeader('Authorization', `Bearer ${localStorage.getItem("apiKey")}`)
+   request.setRequestHeader("Accept", "application/json");
+   $("body").css("cursor", "progress");
+   logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
+   request.send(formData);
+   document.getElementById('transcription-file-selector').value = null;
+   document.getElementById('transcriptionLanguage').value = "";
+   document.getElementById('transcriptionPrompt').value = "";
 };
 
 const translateFile = file => {
-  console.log("Uploading file to OpenAI...");          
-  const request = new XMLHttpRequest();         
-  request.open("POST", TRANSLATION_URL, true);
-  request.onreadystatechange = () => {
-    if (request.readyState === 4 && request.status === 200) {
-      let jsonRequest = JSON.parse(request.responseText);
-      addResponse(TEXT, `English Translation: ${jsonRequest.text}`);
-      logtotoast(TOAST_TYPE_SUCCESS, "Request Completed Successfully");
-      $("body").css("cursor", "default");
-    } else {
-      $("body").css("cursor", "default");
-      if (request.status != 200) {
-        logtotoast(TOAST_TYPE_DANGER, "Invalid File");
+   console.log("Uploading file to OpenAI...");
+   const request = new XMLHttpRequest();
+   request.open("POST", TRANSLATION_URL, true);
+   request.onreadystatechange = () => {
+      if (request.readyState === 4 && request.status === 200) {
+         let jsonRequest = JSON.parse(request.responseText);
+         addResponse(TEXT, `English Translation: ${jsonRequest.text}`);
+         logtotoast(TOAST_TYPE_SUCCESS, "Request Completed Successfully");
+         $("body").css("cursor", "default");
+      } else {
+         $("body").css("cursor", "default");
+         if (request.status != 200) {
+            logtotoast(TOAST_TYPE_DANGER, "Invalid File");
+         }
       }
-    }
-  };
-  var formData = new FormData(); 
-  formData.append('file', file);
-  formData.append('model', document.getElementById('translationModel').value);
-  if (document.getElementById('translationPrompt').value != "") {
-    formData.append('prompt', document.getElementById('translationPrompt').value)
-  }
-  request.setRequestHeader('Authorization', `Bearer ${localStorage.getItem("apiKey")}`)
-  request.setRequestHeader("Accept", "application/json");
-  $("body").css("cursor", "progress");
-  logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
-  request.send(formData);
-  document.getElementById('translation-file-selector').value = null;
-  document.getElementById('translationPrompt').value = "";
+   };
+   var formData = new FormData();
+   formData.append('file', file);
+   formData.append('model', document.getElementById('translationModel').value);
+   if (document.getElementById('translationPrompt').value != "") {
+      formData.append('prompt', document.getElementById('translationPrompt').value)
+   }
+   request.setRequestHeader('Authorization', `Bearer ${localStorage.getItem("apiKey")}`)
+   request.setRequestHeader("Accept", "application/json");
+   $("body").css("cursor", "progress");
+   logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
+   request.send(formData);
+   document.getElementById('translation-file-selector').value = null;
+   document.getElementById('translationPrompt').value = "";
 };
 
 async function analyzeImage() {
-  var input = document.getElementById("analysisURL").value;
+   var input = document.getElementById("analysisURL").value;
 
-  if (input.trim() == "") {
-    logtotoast(TOAST_TYPE_DANGER, "Analysis URL required");
-  } else {
-    response = await callAnalyze(
-      document.getElementById("analysisURL").value,
-      document.getElementById("analysisPrompt").value,
-      document.getElementById("analysisModel").value
-    );
-    document.getElementById("analysisURL").value = "";
-    document.getElementById("analysisPrompt").value = "";
-  } 
+   if (input.trim() == "") {
+      logtotoast(TOAST_TYPE_DANGER, "Analysis URL required");
+   } else {
+      response = await callAnalyze(
+         document.getElementById("analysisURL").value,
+         document.getElementById("analysisPrompt").value,
+         document.getElementById("analysisModel").value
+      );
+      document.getElementById("analysisURL").value = "";
+      document.getElementById("analysisPrompt").value = "";
+   }
 }
 
 async function callAnalyze(url, analysisPrompt, model) {
-  $("#analyzeImage").prop("disabled", true);
-  $(document.getElementById("analyzeImage").querySelector('.spinner-border')).removeClass("visually-hidden");
+   $("#analyzeImage").prop("disabled", true);
+   $(document.getElementById("analyzeImage").querySelector('.spinner-border')).removeClass("visually-hidden");
 
-  $("body").css("cursor", "progress"); 
-  logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
-    // Calling OpenAPI webservice
-    let prompt = "Analyze this image";
-    if (analysisPrompt != "") {
+   $("body").css("cursor", "progress");
+   logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
+   // Calling OpenAPI webservice
+   let prompt = "Analyze this image";
+   if (analysisPrompt != "") {
       prompt = analysisPrompt;
-    }
-    const openAI = {
+   }
+   const openAI = {
       model: model,
       max_tokens: 4096,
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: prompt
+      messages: [{
+         role: "user",
+         content: [{
+               type: "text",
+               text: prompt
             },
             {
-              type: "image_url",
-              image_url: {url: url}
+               type: "image_url",
+               image_url: {
+                  url: url
+               }
             }
-          ]
-        }
-      ]
-    };
-    await $.ajax({
+         ]
+      }]
+   };
+   await $.ajax({
       type: "POST",
       url: OPEN_AI_CHAT_URL,
       data: JSON.stringify(openAI),
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("apiKey")}`,
-        "Content-Type": "application/json",
-        Accept: "application/json",
+         Authorization: `Bearer ${localStorage.getItem("apiKey")}`,
+         "Content-Type": "application/json",
+         Accept: "application/json",
       },
-  
+
       success: function (msg) {
-        logtotoast(TOAST_TYPE_SUCCESS, "Request Completed Successfully");
-  
-        $("body").css("cursor", "default");
-        addResponse(TEXT, `Agent: ${msg.choices[0].message.content}`);
-  
-        $("#analyzeImage").prop("disabled", false);
-        $(document.getElementById("analyzeImage").querySelector('.spinner-border')).addClass("visually-hidden");
+         logtotoast(TOAST_TYPE_SUCCESS, "Request Completed Successfully");
+
+         $("body").css("cursor", "default");
+         addResponse(TEXT, `Agent: ${msg.choices[0].message.content}`);
+
+         $("#analyzeImage").prop("disabled", false);
+         $(document.getElementById("analyzeImage").querySelector('.spinner-border')).addClass("visually-hidden");
       },
       error: function (XMLHttpRequest, textStatus, errorThrown) {
-        $("body").css("cursor", "default");
-        logtotoast(TOAST_TYPE_DANGER, "Invalid Analysis");
-        $("#analyzeImage").prop("disabled", false);
-        $(document.getElementById("analyzeImage").querySelector('.spinner-border')).addClass("visually-hidden");
+         $("body").css("cursor", "default");
+         logtotoast(TOAST_TYPE_DANGER, "Invalid Analysis");
+         $("#analyzeImage").prop("disabled", false);
+         $(document.getElementById("analyzeImage").querySelector('.spinner-border')).addClass("visually-hidden");
       },
-    });
+   });
 }
 
 async function callModeration(prompt, model) {
-  $("#createModeration").prop("disabled", true);
-  $(document.getElementById("createModeration").querySelector('.spinner-border')).removeClass("visually-hidden");
+   $("#createModeration").prop("disabled", true);
+   $(document.getElementById("createModeration").querySelector('.spinner-border')).removeClass("visually-hidden");
 
-  $("body").css("cursor", "progress");
+   $("body").css("cursor", "progress");
 
-  const openAI = {
-    model: model,
-    input: prompt
-  };
+   const openAI = {
+      model: model,
+      input: prompt
+   };
 
-  logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
+   logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
 
-  // Calling OpenAPI webservice
-  await $.ajax({
-    type: "POST",
-    url: MODERATION_URL,
-    data: JSON.stringify(openAI),
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("apiKey")}`,
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
+   // Calling OpenAPI webservice
+   await $.ajax({
+      type: "POST",
+      url: MODERATION_URL,
+      data: JSON.stringify(openAI),
+      headers: {
+         Authorization: `Bearer ${localStorage.getItem("apiKey")}`,
+         "Content-Type": "application/json",
+         Accept: "application/json",
+      },
 
-    success: function (msg) {
-      logtotoast(TOAST_TYPE_SUCCESS, "Request Completed Successfully");
+      success: function (msg) {
+         logtotoast(TOAST_TYPE_SUCCESS, "Request Completed Successfully");
 
-      $("body").css("cursor", "default");
-      addResponse(MODERATION, msg.results)
+         $("body").css("cursor", "default");
+         addResponse(MODERATION, msg.results)
 
-      $("#createModeration").prop("disabled", false);
-      $(document.getElementById("createModeration").querySelector('.spinner-border')).addClass("visually-hidden");
-    },
-    error: function (XMLHttpRequest, textStatus, errorThrown) {
-      $("body").css("cursor", "default");
-      logtotoast(TOAST_TYPE_DANGER, "Invalid Moderation Prompt");
-      $("#createModeration").prop("disabled", false);
-      $(document.getElementById("createModeration").querySelector('.spinner-border')).addClass("visually-hidden");
-    },
-  });
+         $("#createModeration").prop("disabled", false);
+         $(document.getElementById("createModeration").querySelector('.spinner-border')).addClass("visually-hidden");
+      },
+      error: function (XMLHttpRequest, textStatus, errorThrown) {
+         $("body").css("cursor", "default");
+         logtotoast(TOAST_TYPE_DANGER, "Invalid Moderation Prompt");
+         $("#createModeration").prop("disabled", false);
+         $(document.getElementById("createModeration").querySelector('.spinner-border')).addClass("visually-hidden");
+      },
+   });
 }
 
 async function callChatGPT(message) {
-  logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
-  const openAI = {
-    model: document.getElementById("chatModel").value,
-    messages: message,
-    max_tokens: 4096,
-    presence_penalty: 0.5,
-    frequency_penalty: 0.5,
-    temperature: 0
-  };
+   logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
+   const openAI = {
+      model: document.getElementById("chatModel").value,
+      messages: message,
+      max_tokens: 4096,
+      presence_penalty: 0.5,
+      frequency_penalty: 0.5,
+      temperature: 0
+   };
 
-  // Calling OpenAPI webservice
-  await $.ajax({
-    type: "POST",
-    url: OPEN_AI_CHAT_URL,
-    data: JSON.stringify(openAI),
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("apiKey")}`,
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
+   // Calling OpenAPI webservice
+   await $.ajax({
+      type: "POST",
+      url: OPEN_AI_CHAT_URL,
+      data: JSON.stringify(openAI),
+      headers: {
+         Authorization: `Bearer ${localStorage.getItem("apiKey")}`,
+         "Content-Type": "application/json",
+         Accept: "application/json",
+      },
 
-    success: function (msg) {
-      logtotoast(TOAST_TYPE_SUCCESS, "Request Completed Successfully");
-      console.log(msg);
-      var gptMessage = {
-        role: "assistant",
-        content: msg.choices[0].message.content
-      }
-      gptConversation.push(gptMessage);
-      addResponse(TEXT, `Agent: ${msg.choices[0].message.content}`)
-    },
-    error: function (XMLHttpRequest, textStatus, errorThrown) {
-      $("body").css("cursor", "default");
-      logtotoast(TOAST_TYPE_DANGER, "OpenAI chat failure");
-    },
-  });
+      success: function (msg) {
+         logtotoast(TOAST_TYPE_SUCCESS, "Request Completed Successfully");
+         var gptMessage = {
+            role: "assistant",
+            content: msg.choices[0].message.content
+         }
+         gptConversation.push(gptMessage);
+         addResponse(TEXT, `Agent: ${msg.choices[0].message.content}`)
+      },
+      error: function (XMLHttpRequest, textStatus, errorThrown) {
+         $("body").css("cursor", "default");
+         logtotoast(TOAST_TYPE_DANGER, "OpenAI chat failure");
+      },
+   });
 }
 
 async function callGPT(description, size, style, model, number) {
-  $("#createImage").prop("disabled", true);
-  $(document.getElementById("createImage").querySelector('.spinner-border')).removeClass("visually-hidden");
+   $("#createImage").prop("disabled", true);
+   $(document.getElementById("createImage").querySelector('.spinner-border')).removeClass("visually-hidden");
 
-  $("body").css("cursor", "progress");
+   $("body").css("cursor", "progress");
 
-  const openAI = {
-    model: model,
-    prompt: description,
-    n: 1,
-    size: size,
-    style: style, // vivid or natural
-  };
+   const openAI = {
+      model: model,
+      prompt: description,
+      n: 1,
+      size: size,
+      style: style, // vivid or natural
+   };
 
-  openAI.n = parseInt(number, 10);
+   openAI.n = parseInt(number, 10);
 
-  logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
+   logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
 
-  // Calling OpenAPI webservice
-  await $.ajax({
-    type: "POST",
-    url: IMAGE_URL,
-    data: JSON.stringify(openAI),
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("apiKey")}`,
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
+   // Calling OpenAPI webservice
+   await $.ajax({
+      type: "POST",
+      url: IMAGE_URL,
+      data: JSON.stringify(openAI),
+      headers: {
+         Authorization: `Bearer ${localStorage.getItem("apiKey")}`,
+         "Content-Type": "application/json",
+         Accept: "application/json",
+      },
 
-    success: function (msg) {
-      logtotoast(TOAST_TYPE_SUCCESS, "Request Completed Successfully");
-      if (model != DALLE2) {
-        addToConsole(`Image Description: ${msg.data[0].revised_prompt}`,"Agent");
-      }
-      logtotoast(TOAST_TYPE_PRIMARY, "Loading Image...");
-      for (i = 0; i < msg.data.length; i++) {
-        addResponse(IMAGE, `${msg.data[i].url}`);
-      }
+      success: function (msg) {
+         logtotoast(TOAST_TYPE_SUCCESS, "Request Completed Successfully");
+         if (model != DALLE2) {
+            addToConsole(`Image Description: ${msg.data[0].revised_prompt}`, "Agent");
+         }
+         logtotoast(TOAST_TYPE_PRIMARY, "Loading Image...");
+         for (i = 0; i < msg.data.length; i++) {
+            addResponse(IMAGE, `${msg.data[i].url}`);
+         }
 
-      $("body").css("cursor", "default");
+         $("body").css("cursor", "default");
 
-      $("#createImage").prop("disabled", false);
-      $(document.getElementById("createImage").querySelector('.spinner-border')).addClass("visually-hidden");
-    },
-    error: function (XMLHttpRequest, textStatus, errorThrown) {
-      $("body").css("cursor", "default");
-      logtotoast(TOAST_TYPE_DANGER, JSON.parse(XMLHttpRequest.responseText).error.message);
-      $("#createImage").prop("disabled", false);
-      $(document.getElementById("createImage").querySelector('.spinner-border')).addClass("visually-hidden");
-    },
-  });
+         $("#createImage").prop("disabled", false);
+         $(document.getElementById("createImage").querySelector('.spinner-border')).addClass("visually-hidden");
+      },
+      error: function (XMLHttpRequest, textStatus, errorThrown) {
+         $("body").css("cursor", "default");
+         logtotoast(TOAST_TYPE_DANGER, JSON.parse(XMLHttpRequest.responseText).error.message);
+         $("#createImage").prop("disabled", false);
+         $(document.getElementById("createImage").querySelector('.spinner-border')).addClass("visually-hidden");
+      },
+   });
 }
 
 async function createModeration() {
-  var input = document.getElementById("moderationPrompt").value;
+   var input = document.getElementById("moderationPrompt").value;
 
-  if (input.trim() == "") {
-    logtotoast(TOAST_TYPE_DANGER, "Moderation prompt required");
-  } else {
-    response = await callModeration(
-      document.getElementById("moderationPrompt").value,
-      document.getElementById("moderationModel").value
-    );
-    document.getElementById("moderationPrompt").value = "";
-  } 
+   if (input.trim() == "") {
+      logtotoast(TOAST_TYPE_DANGER, "Moderation prompt required");
+   } else {
+      response = await callModeration(
+         document.getElementById("moderationPrompt").value,
+         document.getElementById("moderationModel").value
+      );
+      document.getElementById("moderationPrompt").value = "";
+   }
 }
 
 async function createTTS() {
-  var input = document.getElementById("ttsDescription").value;
-  if (input.trim() == "") {
-    logtotoast(TOAST_TYPE_DANGER, "TTS prompt required");
-    return;
-  }
-  $("#createTTS").prop("disabled", true);
-  $(document.getElementById("createTTS").querySelector('.spinner-border')).removeClass("visually-hidden");
-  var data = JSON.stringify({
-    "model": document.getElementById('ttsModel').value,
-    "input": document.getElementById('ttsDescription').value,
-    "voice": document.getElementById("ttsVoice").value
-  });
+   var input = document.getElementById("ttsDescription").value;
+   if (input.trim() == "") {
+      logtotoast(TOAST_TYPE_DANGER, "TTS prompt required");
+      return;
+   }
+   $("#createTTS").prop("disabled", true);
+   $(document.getElementById("createTTS").querySelector('.spinner-border')).removeClass("visually-hidden");
+   var data = JSON.stringify({
+      "model": document.getElementById('ttsModel').value,
+      "input": document.getElementById('ttsDescription').value,
+      "voice": document.getElementById("ttsVoice").value
+   });
 
-  var xhr = new XMLHttpRequest();
-  xhr.responseType = "blob";
+   var xhr = new XMLHttpRequest();
+   xhr.responseType = "blob";
 
-  xhr.addEventListener("readystatechange", function() {
-    if(this.readyState === 4) {
-      logtotoast(TOAST_TYPE_SUCCESS, "Request Completed Successfully");
-      addResponse(AUDIO, window.URL.createObjectURL(this.response));
-      $("#createTTS").prop("disabled", false);
-      $(document.getElementById("createTTS").querySelector('.spinner-border')).addClass("visually-hidden");
-    }
-  });
+   xhr.addEventListener("readystatechange", function () {
+      if (this.readyState === 4) {
+         logtotoast(TOAST_TYPE_SUCCESS, "Request Completed Successfully");
+         addResponse(AUDIO, window.URL.createObjectURL(this.response));
+         $("#createTTS").prop("disabled", false);
+         $(document.getElementById("createTTS").querySelector('.spinner-border')).addClass("visually-hidden");
+      }
+   });
 
-  xhr.open("POST", TTS_URL);
-  xhr.setRequestHeader("Content-Type", "application/json");
-  xhr.setRequestHeader("Authorization", `Bearer ${localStorage.getItem("apiKey")}`);
-  xhr.setRequestHeader("Accept", "*/*");
-  logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
-  xhr.send(data);
-  document.getElementById('ttsDescription').value = "";
+   xhr.open("POST", TTS_URL);
+   xhr.setRequestHeader("Content-Type", "application/json");
+   xhr.setRequestHeader("Authorization", `Bearer ${localStorage.getItem("apiKey")}`);
+   xhr.setRequestHeader("Accept", "*/*");
+   logtotoast(TOAST_TYPE_PRIMARY, "Sending request...");
+   xhr.send(data);
+   document.getElementById('ttsDescription').value = "";
 }
 
 // Handle CreateImange function. Main function to call
 async function createImage() {
-  var input = document.getElementById("imageDescription").value;
-  if (input.trim() == "") {
-    logtotoast(TOAST_TYPE_DANGER, "Image description required");
-    //alert("Image description required.");
-  } else {
-    response = await callGPT(
-      document.getElementById("imageDescription").value,
-      document.getElementById("gptsize").value,
-      document.getElementById("gptstyle").value,
-      document.getElementById("gptmodel").value,
-      document.getElementById("gptnumber").value
-    );
-    document.getElementById("imageDescription").value = "";
-  }
+   var input = document.getElementById("imageDescription").value;
+   if (input.trim() == "") {
+      logtotoast(TOAST_TYPE_DANGER, "Image description required");
+      //alert("Image description required.");
+   } else {
+      response = await callGPT(
+         document.getElementById("imageDescription").value,
+         document.getElementById("gptsize").value,
+         document.getElementById("gptstyle").value,
+         document.getElementById("gptmodel").value,
+         document.getElementById("gptnumber").value
+      );
+      document.getElementById("imageDescription").value = "";
+   }
 }
 
 function addResponse(type, msg) {
-  var span = createElement(type, msg);
-  $("#image-list").append(span);
-  document.getElementById("image-list").scrollTop = document.getElementById("image-list").scrollHeight;
+   var span = createElement(type, msg);
+   $("#image-list").append(span);
+   document.getElementById("image-list").scrollTop = document.getElementById("image-list").scrollHeight;
 }
 
 function createElement(type, msg) {
-  var span = document.createElement("span");
-  console.log(msg);
-  if (type == TEXT) {
-    if (msg.startsWith("User")) {
-      $(span).addClass("log-element-user");
-    } else {
-      $(span).addClass("log-element-agent");
-    }
-  } else {
-    $(span).addClass("log-element-agent");
-  }
-  $(span).addClass("p-2");
-  var sendSpan = document.createElement("span");
-  $(sendSpan).addClass("log-element-sender");
-  if (type == AUDIO) {
-    sendSpan.innerHTML = `<audio style="border:10px solid lightsalmon;border-radius: 50px;" controls><source src="${msg}" type="audio/mpeg"></audio>`;
-  } else if (type == IMAGE) {
-    sendSpan.innerHTML = `<img src="${msg}" alt="" width="100%" height="100%">`;
-  } else if (type == MODERATION) {
-    sendSpan.innerHTML = `<pre id="json-data">${JSON.stringify(msg, null, 2)}</pre>`;
-  } else if (type == TEXT) {
-    var msgArray = msg.split(":");
-    var sender = msgArray[0];
-    var restMsg = ""; 
-    for (var i = 1; i < msgArray.length; i++) {
-      if (i == 1) {
-        restMsg += " " + msgArray[i];
+   var span = document.createElement("span");
+   console.log(msg);
+   if (type == TEXT) {
+      if (msg.startsWith("User")) {
+         $(span).addClass("log-element-user");
       } else {
-        restMsg += ":" + msgArray[i];
+         $(span).addClass("log-element-agent");
       }
-    }
-    var sendSpan = document.createElement("span");
-    $(sendSpan).addClass("log-element-sender");
-    sendSpan.innerHTML = sender + ":";
-    var msgSpan = document.createElement("span");
-    $(msgSpan).addClass("log-element-msg");
+   } else {
+      $(span).addClass("log-element-agent");
+   }
+   $(span).addClass("p-2");
+   var sendSpan = document.createElement("span");
+   $(sendSpan).addClass("log-element-sender");
+   if (type == AUDIO) {
+      sendSpan.innerHTML = `<audio style="border:10px solid lightsalmon;border-radius: 50px;" controls><source src="${msg}" type="audio/mpeg"></audio>`;
+   } else if (type == IMAGE) {
+      sendSpan.innerHTML = `<img src="${msg}" alt="" width="100%" height="100%">`;
+   } else if (type == MODERATION) {
+      sendSpan.innerHTML = `<pre id="json-data">${JSON.stringify(msg, null, 2)}</pre>`;
+   } else if (type == TEXT) {
+      var msgArray = msg.split(":");
+      var sender = msgArray[0];
+      var restMsg = "";
+      for (var i = 1; i < msgArray.length; i++) {
+         if (i == 1) {
+            restMsg += " " + msgArray[i];
+         } else {
+            restMsg += ":" + msgArray[i];
+         }
+      }
+      var sendSpan = document.createElement("span");
+      $(sendSpan).addClass("log-element-sender");
+      sendSpan.innerHTML = sender + ":";
+      var msgSpan = document.createElement("span");
+      $(msgSpan).addClass("log-element-msg");
 
-    restMsg = restMsg.replaceAll(`\n`, `<BR>`);
+      restMsg = restMsg.replaceAll(`\n`, `<BR>`);
 
-    // A kludge to handle leading spaces at the beginning of a line
-    restMsg = restMsg.replaceAll(`<BR>  `, `<BR>&nbsp;&nbsp;`);
-    restMsg = restMsg.replaceAll(`&nbsp;&nbsp; `, `&nbsp;&nbsp;&nbsp;&nbsp;`);
-    restMsg = restMsg.replaceAll(`&nbsp;&nbsp;&nbsp; `, `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`);
-    restMsg = restMsg.replaceAll(`&nbsp;&nbsp;&nbsp;&nbsp; `, `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`);
-    restMsg = restMsg.replaceAll(`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `, `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`);
-    restMsg = restMsg.replaceAll(`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `, `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`);
-    restMsg = restMsg.replaceAll(`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `, `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`);
+      // A kludge to handle leading spaces at the beginning of a line
+      restMsg = restMsg.replaceAll(`<BR>  `, `<BR>&nbsp;&nbsp;`);
+      restMsg = restMsg.replaceAll(`&nbsp;&nbsp; `, `&nbsp;&nbsp;&nbsp;&nbsp;`);
+      restMsg = restMsg.replaceAll(`&nbsp;&nbsp;&nbsp; `, `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`);
+      restMsg = restMsg.replaceAll(`&nbsp;&nbsp;&nbsp;&nbsp; `, `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`);
+      restMsg = restMsg.replaceAll(`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `, `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`);
+      restMsg = restMsg.replaceAll(`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `, `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`);
+      restMsg = restMsg.replaceAll(`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `, `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`);
 
-    $(msgSpan).append(messageWithLink(restMsg));
-    $(span).append(sendSpan);
-    $(span).append(msgSpan);
-    return span;   
-  }
-  var msgSpan = document.createElement("span");
-  $(msgSpan).addClass("log-element-msg");
-  $(span).append(sendSpan);
-  $(span).append(msgSpan);
-  return span;
+      $(msgSpan).append(messageWithLink(restMsg));
+      $(span).append(sendSpan);
+      $(span).append(msgSpan);
+      return span;
+   }
+   var msgSpan = document.createElement("span");
+   $(msgSpan).addClass("log-element-msg");
+   $(span).append(sendSpan);
+   $(span).append(msgSpan);
+   return span;
 }
 
 function addToConsole(msg, requestor) {
-  var span = createLogElement(msg, requestor);
-  $("#console-log").append(span);
-  document.getElementById("console-log").scrollTop = document.getElementById("console-log").scrollHeight;
+   var span = createLogElement(msg, requestor);
+   $("#console-log").append(span);
+   document.getElementById("console-log").scrollTop = document.getElementById("console-log").scrollHeight;
 }
 
 function createLogElement(msg, type) {
-  var span = document.createElement("span");
-  if (type == "User") {
-    $(span).addClass("log-element");
-  } else {
-    $(span).addClass("log-element-agent");
-  }
-  $(span).addClass("p-2");
+   var span = document.createElement("span");
+   if (type == "User") {
+      $(span).addClass("log-element");
+   } else {
+      $(span).addClass("log-element-agent");
+   }
+   $(span).addClass("p-2");
 
-  var msgArray = msg.split(":");
-  var sender = msgArray[0];
-  var restMsg = "";
+   var msgArray = msg.split(":");
+   var sender = msgArray[0];
+   var restMsg = "";
 
-  for (var i = 1; i < msgArray.length; i++) {
-    if (i == 1) {
-      restMsg += " " + msgArray[i];
-    } else {
-      restMsg += ":" + msgArray[i];
-    }
-  }
+   for (var i = 1; i < msgArray.length; i++) {
+      if (i == 1) {
+         restMsg += " " + msgArray[i];
+      } else {
+         restMsg += ":" + msgArray[i];
+      }
+   }
 
-  var sendSpan = document.createElement("span");
+   var sendSpan = document.createElement("span");
 
-  $(sendSpan).addClass("log-element-sender");
-  sendSpan.innerHTML = sender + ":";
-  var msgSpan = document.createElement("span");
-  $(msgSpan).addClass("log-element-msg");
-  restMsg = restMsg.replaceAll(`\n`, `<BR>`);
-  $(msgSpan).append(messageWithLink(restMsg));
-  $(span).append(sendSpan);
-  $(span).append(msgSpan);
-  return span;
+   $(sendSpan).addClass("log-element-sender");
+   sendSpan.innerHTML = sender + ":";
+   var msgSpan = document.createElement("span");
+   $(msgSpan).addClass("log-element-msg");
+   restMsg = restMsg.replaceAll(`\n`, `<BR>`);
+   $(msgSpan).append(messageWithLink(restMsg));
+   $(span).append(sendSpan);
+   $(span).append(msgSpan);
+   return span;
 }
 
 function messageWithLink(msg) {
-  var matches = msg.match(/[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);
-  if (matches) {
-    for (var i = 0; i < matches.length; i++) {
-      if (matches[i].toLowerCase().indexOf("http") != -1) {
-        // handle hyperlinks
-        msg = msg.replace(matches[i],' <a href = "' + matches[i] + '"target = "_blank" > ' + matches[i] + " </a>");
+   var matches = msg.match(/[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);
+   if (matches) {
+      for (var i = 0; i < matches.length; i++) {
+         if (matches[i].toLowerCase().indexOf("http") != -1) {
+            // handle hyperlinks
+            msg = msg.replace(matches[i], ' <a href = "' + matches[i] + '"target = "_blank" > ' + matches[i] + " </a>");
+         }
       }
-    }
-  }
-  return msg;
+   }
+   return msg;
 }

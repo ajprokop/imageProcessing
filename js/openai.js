@@ -264,7 +264,8 @@ const uploadFile = file => {
    };
    var formData = new FormData();
    formData.append('image', file);
-   formData.append('model', DALLE2);
+   //formData.append('model', DALLE2);
+   formData.append('model', document.getElementById("gptmodelVariations").value);
    formData.append('n', parseInt(document.getElementById("variationsnumber").value, 10));
    request.setRequestHeader('Authorization', `Bearer ${localStorage.getItem("apiKey")}`)
    request.setRequestHeader("Accept", "application/json");
